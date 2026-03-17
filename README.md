@@ -45,26 +45,26 @@ pip install -r requirements.txt
 
 ## Cómo ejecutar la aplicación
 
-### Clonar el repositorio y situarse en la carpeta del proyecto:
+##### Clonar el repositorio y situarse en la carpeta del proyecto:
 
 ```bash
 git clone <url-del-repo>
 cd Tarea_M8_ZIP
 ```
 
-### Instalar las dependencias:
+##### Instalar las dependencias:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Ejecutar la aplicación con Streamlit:
+##### Ejecutar la aplicación con Streamlit:
 
 ```bash
 streamlit run app.py
 ```
 
-### Abrir la URL que muestra Streamlit en el navegador para acceder a la app.
+##### Abrir la URL que muestra Streamlit en el navegador para acceder a la app.
 
 ---
 
