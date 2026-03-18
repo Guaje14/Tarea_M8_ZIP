@@ -8,6 +8,7 @@ plotly
 numpy
 openpyxl
 LanusStats
+webdriver-manager
 kaleido
 python-dotenv
 IPython
