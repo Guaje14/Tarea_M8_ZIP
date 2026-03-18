@@ -22,7 +22,6 @@ def apply_player_filters(df, col1, col2, col3, col4, col5, prefix):
             "% Min Played",        
             0,                     
             100,                   
-            st.session_state[minutes_key],  
             key=minutes_key        
         )
     df_base = df.copy()
