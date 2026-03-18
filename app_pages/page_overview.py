@@ -5,6 +5,7 @@
 # Importar librerías 
 import streamlit as st
 from PIL import Image
+import io
 
 # Importar rutas de configuración
 from common.config import (
@@ -14,6 +15,7 @@ from common.config import (
 # Importar funciones de datos y filtros
 from controllers.db_controller import load_stats_players_fbref
 from common.filters import apply_player_filters
+from controllers.logs_export_csv import log_download_event
 
 # Función que da cómo resultado la página Overview
 def page_overview():
@@ -108,6 +110,23 @@ def page_overview():
             # Fijar columnas a la izquierda para mejor visualización
             "Id_player": st.column_config.Column(pinned="left"),
             "Player": st.column_config.Column(pinned="left"),
+        }
+    )
+    
+    # Crear CSV en memoria
+    csv_buffer = io.StringIO()
+    overview_filtered_df.to_csv(csv_buffer, index=False)
+
+    # Botón descarga + log
+    st.download_button(
+        label="📥 Download CSV",
+        data=csv_buffer.getvalue(),
+        file_name="players_overview.csv",
+        mime="text/csv",
+        on_click=log_download_event,
+        kwargs={
+            "page_name": "overview",
+            "prefix": "overview"
         }
     )
 

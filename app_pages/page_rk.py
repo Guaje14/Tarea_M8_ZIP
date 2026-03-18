@@ -7,6 +7,7 @@ import streamlit as st
 from PIL import Image
 import difflib
 import pandas as pd
+import io
 
 # Importar rutas de configuración
 from common.config import (
@@ -16,6 +17,7 @@ from common.config import (
 # Importar funciones de datos y filtros
 from controllers.db_controller import load_stats_players_fbref
 from common.filters import apply_player_filters
+from controllers.logs_export_csv import log_download_event
 
 # Función que da cómo resultado la página Ranking
 def page_rk():
@@ -217,6 +219,26 @@ def page_rk():
         column_config={
             "Rk": st.column_config.Column(pinned="left"),
             "Player": st.column_config.Column(pinned="left"),
+        }
+    )
+    
+    # Crear CSV
+    csv_buffer = io.StringIO()
+    rk_filtered_df.to_csv(csv_buffer, index=False)
+
+    # Botón descarga + log
+    st.download_button(
+        label="📥 Download CSV",
+        data=csv_buffer.getvalue(),
+        file_name="players_ranking.csv",
+        mime="text/csv",
+        on_click=log_download_event,
+        kwargs={
+            "page_name": "ranking",
+            "prefix": "rk",
+            "extra_data": {
+                "selected_stat": st.session_state.get("rk_selected_stat")
+            }
         }
     )
         
