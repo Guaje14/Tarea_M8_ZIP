@@ -7,21 +7,36 @@ from datetime import datetime
 import streamlit as st
 import pandas as pd
 from pathlib import Path
+import os
 
 # Importar rutas de configuración
 from common.config import (
     LOG_FILE
 )
 
+# Importar el modelo de usuario
+from models.user import User
+
 # Función para generar un registro de la descarga
 def build_download_log(page_name: str, prefix: str, extra_data: dict = None):
     
+    # Obtener el usuario desde session_state
+    user_obj = st.session_state.get("user", None)  # Puede ser un objeto User o None
+
+    if isinstance(user_obj, User):
+        username = user_obj.username
+        is_admin = user_obj.is_admin()
+    else:
+        # Si no hay usuario, usar valores por defecto
+        username = "anonymous"
+        is_admin = False
+
     # Construcción del log base
     log_data = {
-    
-        # Usuario (si no existe en session → 'anonymous')
-        "user": st.session_state.get("user", "anonymous"),
-
+        
+        # Usuario 
+        "user": username,
+        
         # Timestamp del momento de la descarga
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 
@@ -50,8 +65,8 @@ def save_log_to_excel(log_data: dict):
     new_row = pd.DataFrame([log_data])
 
     # Si el archivo existe → añadir datos
-    if LOG_FILE.exists():
-        existing_df = pd.read_excel(LOG_FILE)
+    if os.path.exists(LOG_FILE) and os.path.getsize(LOG_FILE) > 0:
+        existing_df = pd.read_excel(LOG_FILE, engine='openpyxl')
         updated_df = pd.concat([existing_df, new_row], ignore_index=True)
     else:
         # Si no existe → crear nuevo archivo
