@@ -476,22 +476,22 @@ def page_list():
             pdf.add_page()
 
             pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
-            pdf.set_font("DejaVu", "", 12)
+            pdf.set_font("DejaVu", "", 25)
 
-            pdf.cell(0, 10, "Player List", ln=True, align="C")
+            pdf.cell(0, 10, "List of Players", ln=True, align="C")
             pdf.ln(5)
 
-            col_widths = [30, 25, 25, 20, 20, 30, 20]
+            col_widths = [35, 25, 25, 20, 20, 30, 20]
             headers = ["Player", "Team", "League", "Position", "List", "Note", "User"]
 
             for i, header in enumerate(headers):
                 pdf.cell(col_widths[i], 8, header, border=1, align="C")
             pdf.ln()
 
-            def truncate(text, max_len=15):
+            def truncate(text, max_len=10):
                 return text[:max_len] + "..." if len(text) > max_len else text
 
-            pdf.set_font("DejaVu", "", 10)
+            pdf.set_font("DejaVu", "", 7)
             for _, row in df_list.iterrows():
                 pdf.cell(col_widths[0], 8, truncate(str(row["Player"])), border=1)
                 pdf.cell(col_widths[1], 8, truncate(str(row["Team"])), border=1)
