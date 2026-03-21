@@ -614,8 +614,7 @@ def page_radar():
         pdf.image(radar_image_path, x=15, w=180)
 
         # Insertar logo usando ruta temporal
-        from common.pdf_utils import get_watermark_path  # esta función debe devolver ruta
-        logo_path = get_watermark_path(alpha=10)
+        logo_path = get_watermark(alpha=10)
         pdf.image(logo_path, x=55, y=100, w=100)
 
         # -----------------------------
