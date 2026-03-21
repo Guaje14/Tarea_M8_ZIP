@@ -393,18 +393,14 @@ def page_radar():
             elif method_val == "Percentil":
             
                 # Calcular la media de minutos entre los dos jugadores  
-                min_avg = (minA + minB) / 2
+                min_half_avg = ((minA + minB) / 2) / 2  
                 
                 # Filtrar la muestra (df_base) por posición y minutos
-                df_baseA = radar_df[
-                    (radar_df["stats_Pos"] == posA) &
-                    (radar_df["stats_Min"] >= min_avg)
-                ]
-
-                df_baseB = radar_df[
-                    (radar_df["stats_Pos"] == posB) &
-                    (radar_df["stats_Min"] >= min_avg)
-                ]
+                df_baseA = radar_df[(radar_df["stats_Pos"] == posA) 
+                                    & (radar_df["stats_Min"] >= min_half_avg)]
+                
+                df_baseB = radar_df[(radar_df["stats_Pos"] == posB) 
+                                    & (radar_df["stats_Min"] >= min_half_avg)]
                 
                 # Normalizar la estadística a 90 minutos
                 valA_norm = valA / minA * 90
