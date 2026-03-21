@@ -12,6 +12,7 @@ import uuid
 import base64
 import streamlit.components.v1 as components
 from fpdf import FPDF
+from io import BytesIO
 
 # Importar rutas de configuración
 from common.config import (
@@ -369,13 +370,13 @@ def page_lineup():
         
     with lineup_field_col:
 
-        fig, ax = plt.subplots(figsize=(w/100, h/100))
+        fig_lineup, ax_lineup = plt.subplots(figsize=(w/100, h/100))
         
         # Mostrar imagen de fondo
-        ax.imshow(lineup_pitch_img)
+        ax_lineup.imshow(lineup_pitch_img)
         
         # Quitar ejes
-        ax.axis('off')
+        ax_lineup.axis('off')
 
         # Dibujar posiciones y jugadores
         for idx, pos in enumerate(lineup_pos_coords):
@@ -384,10 +385,10 @@ def page_lineup():
             
             # Dibujar círculo de posición
             color = "green" if st.session_state["lineup_players"][idx] else "red"
-            ax.add_patch(plt.Circle((x,y), 25, color=color))
+            ax_lineup.add_patch(plt.Circle((x,y), 25, color=color))
             
             # Número de posición dentro del círculo
-            ax.text(x, y, str(idx+1), color='white', ha='center', va='center', fontsize=15, fontweight='bold')
+            ax_lineup.text(x, y, str(idx+1), color='white', ha='center', va='center', fontsize=15, fontweight='bold')
 
             # Mostrar nombre del jugador debajo del círculo si está asignado
             if st.session_state["lineup_players"][idx]:
@@ -395,17 +396,17 @@ def page_lineup():
                 palabras = nombre.split()
                 lineas = [" ".join(palabras[i:i+2]) for i in range(0, len(palabras),2)]
                 nombre_wrap = "\n".join(lineas)
-                ax.text(x, y+50, nombre_wrap, color="black", ha='center', va='top', fontsize=18)
+                ax_lineup.text(x, y+50, nombre_wrap, color="black", ha='center', va='top', fontsize=18)
 
         # Mostrar cancha con jugadores asignados
-        st.pyplot(fig)
+        st.pyplot(fig_lineup)
     
     # Botón para imprimir la página 
     components.html(
     """
     <button onclick="parent.window.print()" style="
         padding:8px 14px;
-        font-size:16px;
+        font-size:14px;
         cursor:pointer;
         background-color:#2563eb;
         color:white;
@@ -419,55 +420,70 @@ def page_lineup():
 
     if st.button("⚙️ Prepare PDF"):
 
-        # Crear figura del campograma
-        fig, ax = plt.subplots(figsize=(6,9))
-        ax.imshow(lineup_pitch_img)
-        ax.axis("off")
+        # Crear figura
+        fig_lineup, ax_lineup = plt.subplots(figsize=(6,9))
+        ax_lineup.imshow(lineup_pitch_img)
+        ax_lineup.axis("off")
 
         for idx, pos in enumerate(lineup_pos_coords):
-            x = pos[0]*w
-            y = pos[1]*h
-            color = "green" if st.session_state["lineup_players"][idx] else "red"
-            ax.add_patch(plt.Circle((x,y), 25, color=color))
-            ax.text(x, y, str(idx+1), color='white', ha='center', va='center', fontsize=7, fontweight='bold')
+            x_lineup = pos[0]*w
+            y_lineup = pos[1]*h
+            color_lineup = "green" if st.session_state["lineup_players"][idx] else "red"
+            ax_lineup.add_patch(plt.Circle((x_lineup,y_lineup), 25, color=color_lineup))
+            ax_lineup.text(x_lineup, y_lineup, str(idx+1), color='white', ha='center', va='center', fontsize=7, fontweight='bold')
             if st.session_state["lineup_players"][idx]:
-                nombre = st.session_state["lineup_players"][idx]
-                ax.text(x, y+50, nombre, color="black", ha='center', va='top', fontsize=7)
+                nombre_lineup = st.session_state["lineup_players"][idx]
+                ax_lineup.text(x_lineup, y_lineup+50, nombre_lineup, color="black", ha='center', va='top', fontsize=7)
 
-        # Guardar figura temporalmente
-        temp_img_path = DATA_DIR / "lineup_temp.png"
-        fig.savefig(temp_img_path, bbox_inches='tight', dpi=150)
-        plt.close(fig)
+        # 🧠 1. Guardar imagen en memoria (NO disco)
+        img_buffer_lineup = BytesIO()
+        fig_lineup.savefig(img_buffer_lineup, format="png", bbox_inches='tight', dpi=150)
+        plt.close(fig_lineup)
+        img_buffer_lineup.seek(0)
 
         # Crear PDF
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
-        pdf.set_font("DejaVu", "", 12)
+        pdf_lineup = FPDF()
+        pdf_lineup.add_page()
+        pdf_lineup.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
+        pdf_lineup.set_font("DejaVu", "", 12)
 
         usuario = st.session_state.get("user","Desconocido")
         sistema = st.session_state.get("lineup_sistema","1-4-4-2")
         jornada = st.session_state.get("lineup_matchday",1)
-        title = f"User: {usuario}        System: {sistema}       Matchday: {jornada}"
-        pdf.cell(0, 10, title, ln=True, align="C")
-        pdf.ln(5)
+        title = f"User: {usuario}    System: {sistema}    Matchday: {jornada}"
 
-        # Insertar la imagen
-        pdf.image(str(temp_img_path), x=15, w=180)
+        pdf_lineup.cell(0, 10, title, ln=True, align="C")
+        pdf_lineup.ln(5)
 
-        # Insertar logo
-        logo_buffer = get_watermark(alpha=10)
-        pdf.image(logo_buffer, x=55, y=100, w=100)
+        # 🧠 2. FPDF NO acepta BytesIO directamente → hay que pasar por base64
+        img_base64_lineup = base64.b64encode(img_buffer_lineup.read()).decode("utf-8")
+        img_src_lineup = f"data:image/png;base64,{img_base64_lineup}"
 
-        # Guardar PDF en disco
-        pdf_path = DATA_DIR / "lineup.pdf"
-        pdf.output(str(pdf_path))
+        pdf_lineup.image(img_src_lineup, x_lineup=15, w=180)
 
-        # Botón para descargar PDF usando Streamlit
-        with open(pdf_path, "rb") as f:
-            st.download_button(
-                label="📄 Export to PDF",
-                data=f,
-                file_name="lineup.pdf",
-                mime="application/pdf"
-            )
+        # Logo
+        logo_buffer_lineup = get_watermark(alpha=10)
+        pdf_lineup.image(logo_buffer_lineup, x_lineup=55, y_lineup=100, w=100)
+
+        # 🧠 3. PDF en memoria
+        pdf_bytes_lineup = pdf_lineup.output(dest="S").encode("latin-1")
+        b64_pdf_lineup = base64.b64encode(pdf_bytes_lineup).decode()
+
+        # Botón rojo
+        components.html(
+            f"""
+            <a href="data:application/pdf_lineup;base64,{b64_pdf_lineup}" download="lineup.pdf">
+                <button style="
+                    padding:8px 14px;
+                    font-size:14px;
+                    cursor:pointer;
+                    background-color:#dc2626;
+                    color:white;
+                    border:none;
+                    border-radius:6px;">
+                    📄 Export to PDF
+                </button>
+            </a>
+            """,
+            height=55
+        )

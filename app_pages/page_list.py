@@ -456,7 +456,7 @@ def page_list():
     """
     <button onclick="parent.window.print()" style="
         padding:8px 14px;
-        font-size:16px;
+        font-size:14px;
         cursor:pointer;
         background-color:#2563eb;
         color:white;
@@ -468,52 +468,72 @@ def page_list():
     height=55
     )
     
+    # Verificar que el DataFrame no esté vacío
     if not df_list.empty:
 
+        # Botón en Streamlit para preparar el PDF
         if st.button("⚙️ Prepare PDF"):
 
-            pdf = FPDF()
-            pdf.add_page()
+            # Crear objeto PDF
+            pdf_list = FPDF()
+            
+            # Añadir una página al documento
+            pdf_list.add_page()  
 
-            pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
-            pdf.set_font("DejaVu", "", 12)
+            # Añadir fuente personalizada 
+            pdf_list.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
 
-            pdf.cell(0, 10, "List of Players", ln=True, align="C")
-            pdf.ln(5)
+            # Título del PDF
+            pdf_list.set_font("DejaVu", "", 25)
+            pdf_list.cell(0, 12, "List of Players", ln=True, align="C")  
+            pdf_list.ln(5)  
 
-            col_widths = [35, 35, 35, 20, 20, 20, 20]
-            headers = ["Player", "Team", "League", "Position", "List", "Note", "User"]
+            # Configurar fuente para cabecera de tabla
+            pdf_list.set_font("DejaVu", "", 12)
+            
+            # Anchos de cada columna
+            col_widths_list = [35, 35, 35, 20, 20, 20, 20]
+            
+            # Nombres de columnas
+            headers_list = ["Player", "Team", "League", "Position", "List", "Note", "User"]
 
-            for i, header in enumerate(headers):
-                pdf.cell(col_widths[i], 8, header, border=1, align="C")
-            pdf.ln()
+            # Crear cabecera de la tabla
+            for i, header in enumerate(headers_list):
+                pdf_list.cell(col_widths_list[i], 8, header, border=1, align="C")
+            pdf_list.ln()  # Nueva línea después de la cabecera
 
-            def truncate(text, max_len=20):
+            # Función auxiliar para truncar texto largo 
+            def truncate(text, max_len=19):
                 return text[:max_len] + "..." if len(text) > max_len else text
 
-            pdf.set_font("DejaVu", "", 7)
+            # Configurar fuente para datos
+            pdf_list.set_font("DejaVu", "", 8)
+
+            # Recorrer filas del DataFrame
             for _, row in df_list.iterrows():
-                pdf.cell(col_widths[0], 8, truncate(str(row["Player"])), border=1)
-                pdf.cell(col_widths[1], 8, truncate(str(row["Team"])), border=1)
-                pdf.cell(col_widths[2], 8, truncate(str(row["League"])), border=1)
-                pdf.cell(col_widths[3], 8, str(row["Position"]), border=1)
-                pdf.cell(col_widths[4], 8, str(row["List"]), border=1)
-                pdf.cell(col_widths[5], 8, truncate(str(row["Note"])), border=1)
-                pdf.cell(col_widths[6], 8, str(row["User"]), border=1)
-                pdf.ln()
+                pdf_list.cell(col_widths_list[0], 8, truncate(str(row["Player"])), border=1)
+                pdf_list.cell(col_widths_list[1], 8, truncate(str(row["Team"])), border=1)
+                pdf_list.cell(col_widths_list[2], 8, truncate(str(row["League"])), border=1)
+                pdf_list.cell(col_widths_list[3], 8, str(row["Position"]), border=1)
+                pdf_list.cell(col_widths_list[4], 8, str(row["List"]), border=1)
+                pdf_list.cell(col_widths_list[5], 8, truncate(str(row["Note"])), border=1)
+                pdf_list.cell(col_widths_list[6], 8, str(row["User"]), border=1)
+                pdf_list.ln()  # Nueva línea por cada fila
 
-            # Logo
-            logo_buffer = get_watermark(alpha=10)
-            pdf.image(logo_buffer, x=55, y=100, w=100)
+            # Añadir logo como marca de agua
+            logo_buffer_list = get_watermark(alpha=10)
+            pdf_list.image(logo_buffer_list, x=55, y=100, w=100)
 
-            # Generar PDF en memoria correctamente
-            pdf_bytes = pdf.output(dest="S").encode("latin-1")
+            # Generar PDF en memoria (no se guarda en disco)
+            pdf_bytes_list = pdf_list.output(dest="S").encode("latin-1")
 
-            b64 = base64.b64encode(pdf_bytes).decode()
+            # Codificar PDF en base64 para descarga en navegador
+            b64_list = base64.b64encode(pdf_bytes_list).decode()
 
+            # Crear botón HTML para descargar el PDF
             components.html(
                 f"""
-                <a href="data:application/pdf;base64,{b64}" download="player_list.pdf">
+                <a href="data:application/pdf_list;base64,{b64_list}" download="player_list.pdf">
                     <button style="
                         padding:8px 14px;
                         font-size:14px;
