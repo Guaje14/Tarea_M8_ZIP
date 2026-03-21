@@ -565,8 +565,8 @@ def page_radar():
     
     if st.button("⚙️ Prepare PDF") and chart_type_val and playerA and playerB:
 
-        # Guardar la figura de Plotly a PNG en memoria usando PIL
-        img_bytes = fig.to_image(format="png", width=800, height=600, scale=2, engine="plotly")
+        # Convertir Plotly a PNG en memoria (sin engine)
+        img_bytes = fig.to_image(format="png", width=800, height=600, scale=2)
         radar_image = Image.open(BytesIO(img_bytes))
 
         # Crear PDF
@@ -585,7 +585,7 @@ def page_radar():
         pdf.multi_cell(0, 10, title, align="C")
         pdf.ln(5)
 
-        # Guardar la imagen temporal en un buffer compatible con FPDF
+        # Guardar la imagen en un buffer para FPDF
         radar_buffer = BytesIO()
         radar_image.save(radar_buffer, format="PNG")
         radar_buffer.seek(0)
