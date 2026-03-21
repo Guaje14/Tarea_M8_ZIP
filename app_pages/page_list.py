@@ -509,11 +509,22 @@ def page_list():
             # Generar PDF en memoria correctamente
             pdf_bytes = pdf.output(dest="S").encode("latin-1")
 
-            pdf_buffer = BytesIO(pdf_bytes)
+            b64 = base64.b64encode(pdf_bytes).decode()
 
-            st.download_button(
-                label="📄 Export to PDF",
-                data=pdf_buffer,
-                file_name="player_list.pdf",
-                mime="application/pdf"
+            components.html(
+                f"""
+                <a href="data:application/pdf;base64,{b64}" download="player_list.pdf">
+                    <button style="
+                        padding:8px 14px;
+                        font-size:14px;
+                        cursor:pointer;
+                        background-color:#dc2626;
+                        color:white;
+                        border:none;
+                        border-radius:6px;">
+                        📄 Export to PDF
+                    </button>
+                </a>
+                """,
+                height=55
             )
