@@ -476,33 +476,37 @@ def page_list():
             pdf.add_page()
 
             pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
-            pdf.set_font("DejaVu", "", 9)
+            pdf.set_font("DejaVu", "", 12)
 
             pdf.cell(0, 10, "Player List", ln=True, align="C")
             pdf.ln(5)
 
-            col_widths = [35, 25, 25, 25, 25, 35, 20]
+            col_widths = [30, 25, 25, 20, 20, 30, 20]
             headers = ["Player", "Team", "League", "Position", "List", "Note", "User"]
 
             for i, header in enumerate(headers):
                 pdf.cell(col_widths[i], 8, header, border=1, align="C")
             pdf.ln()
 
+            def truncate(text, max_len=15):
+                return text[:max_len] + "..." if len(text) > max_len else text
+
             pdf.set_font("DejaVu", "", 10)
             for _, row in df_list.iterrows():
-                pdf.cell(col_widths[0], 8, str(row["Player"]), border=1)
-                pdf.cell(col_widths[1], 8, str(row["Team"]), border=1)
-                pdf.cell(col_widths[2], 8, str(row["League"]), border=1)
-                pdf.cell
-                pdf.cell(col_widths[3], 8, str(row["Note"]), border=1)
-                pdf.cell(col_widths[4], 8, str(row["User"]), border=1)
+                pdf.cell(col_widths[0], 8, truncate(str(row["Player"])), border=1)
+                pdf.cell(col_widths[1], 8, truncate(str(row["Team"])), border=1)
+                pdf.cell(col_widths[2], 8, truncate(str(row["League"])), border=1)
+                pdf.cell(col_widths[3], 8, str(row["Position"]), border=1)
+                pdf.cell(col_widths[4], 8, str(row["List"]), border=1)
+                pdf.cell(col_widths[5], 8, truncate(str(row["Note"])), border=1)
+                pdf.cell(col_widths[6], 8, str(row["User"]), border=1)
                 pdf.ln()
 
             # Logo
             logo_buffer = get_watermark(alpha=10)
             pdf.image(logo_buffer, x=55, y=100, w=100)
 
-            # 🔥 CLAVE: generar PDF en memoria correctamente
+            # Generar PDF en memoria correctamente
             pdf_bytes = pdf.output(dest="S").encode("latin-1")
 
             pdf_buffer = BytesIO(pdf_bytes)
