@@ -85,8 +85,61 @@ def page_newleague():
     def load_leagues():
         try:
             return get_possible_leagues('Copa de la Liga', '2023', 'Fbref')
+        
         except Exception:
-            return {"Fbref": {}}
+            
+            # Fallback manual sin LanusStats
+            lista_ligas = [
+                "Copa de la Liga",
+                "Primera Division Argentina",
+                "Primera Division Uruguay",
+                "Brasileirao",
+                "Brasileirao B",
+                "Primera Division Colombia",
+                "Primera Division Chile",
+                "Primera Division Peru",
+                "Primera Division Venezuela",
+                "Primera Division Ecuador",
+                "Primera Division Bolivia",
+                "Primera Division Paraguay",
+                "Brasileirao F",
+                "MLS",
+                "USL Championship",
+                "Premier League",
+                "La Liga",
+                "Ligue 1",
+                "Bundesliga",
+                "Serie A",
+                "Big 5 European Leagues",
+                "Danish Superliga",
+                "Eredivisie",
+                "Primeira Liga Portugal",
+                "Copa America",
+                "Euros",
+                "Saudi League",
+                "EFL Championship",
+                "La Liga 2",
+                "Belgian Pro League",
+                "Challenger Pro League",
+                "2. Bundesliga",
+                "Ligue 2",
+                "Serie B",
+                "J1 League",
+                "NWSL",
+                "Womens Super League",
+                "Liga F",
+                "Premier Division South Africa",
+                "Champions League",
+                "Europa League",
+                "Conference League",
+                "Copa Libertadores",
+                "Liga MX"
+            ]
+
+            # Convertimos lista → dict como espera tu código
+            return {
+                "Fbref": {liga: {} for liga in lista_ligas}
+            }
     
     ligas = ligas = load_leagues()
 
