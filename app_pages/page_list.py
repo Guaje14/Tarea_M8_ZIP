@@ -472,28 +472,24 @@ def page_list():
 
         if st.button("⚙️ Prepare PDF"):
 
-            # Crear PDF
             pdf = FPDF()
             pdf.add_page()
 
-            # Registrar fuente Unicode
             pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
             pdf.set_font("DejaVu", "", 12)
 
-            # Título
             pdf.cell(0, 10, "Player List", ln=True, align="C")
             pdf.ln(5)
 
-            # Columnas y encabezados
-            col_widths = [50, 40, 40, 30, 30]  # Player, Team, League, Note, User
+            col_widths = [50, 40, 40, 30, 30]
             headers = ["Player", "Team", "League", "Note", "User"]
+
             for i, header in enumerate(headers):
                 pdf.cell(col_widths[i], 8, header, border=1, align="C")
             pdf.ln()
 
-            # Filas
             pdf.set_font("DejaVu", "", 10)
-            for i, row in df_list.iterrows():
+            for _, row in df_list.iterrows():
                 pdf.cell(col_widths[0], 8, str(row["Player"]), border=1)
                 pdf.cell(col_widths[1], 8, str(row["Team"]), border=1)
                 pdf.cell(col_widths[2], 8, str(row["League"]), border=1)
@@ -501,16 +497,15 @@ def page_list():
                 pdf.cell(col_widths[4], 8, str(row["User"]), border=1)
                 pdf.ln()
 
-            # Insertar logo
+            # Logo
             logo_buffer = get_watermark(alpha=10)
             pdf.image(logo_buffer, x=55, y=100, w=100)
 
-            # Guardar PDF en memoria usando BytesIO
-            pdf_buffer = BytesIO()
-            pdf.output(pdf_buffer)
-            pdf_buffer.seek(0)  # Volver al inicio del buffer
+            # 🔥 CLAVE: generar PDF en memoria correctamente
+            pdf_bytes = pdf.output(dest="S").encode("latin-1")
 
-            # Descargar PDF usando Streamlit sin tocar disco
+            pdf_buffer = BytesIO(pdf_bytes)
+
             st.download_button(
                 label="📄 Export to PDF",
                 data=pdf_buffer,
