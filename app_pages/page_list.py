@@ -11,6 +11,7 @@ from openpyxl import load_workbook
 import base64
 from fpdf import FPDF
 import streamlit.components.v1 as components
+from io import BytesIO
 
 # Importar rutas de configuración
 from common.config import (
@@ -504,15 +505,15 @@ def page_list():
             logo_buffer = get_watermark(alpha=10)
             pdf.image(logo_buffer, x=55, y=100, w=100)
 
-            # Guardar PDF directamente en disco
-            pdf_path = DATA_DIR / "player_list.pdf"
-            pdf.output(str(pdf_path))
+            # Guardar PDF en memoria usando BytesIO
+            pdf_buffer = BytesIO()
+            pdf.output(pdf_buffer)
+            pdf_buffer.seek(0)  # Volver al inicio del buffer
 
-            # Descargar PDF usando Streamlit
-            with open(pdf_path, "rb") as f:
-                st.download_button(
-                    label="📄 Export to PDF",
-                    data=f,
-                    file_name="player_list.pdf",
-                    mime="application/pdf"
-                )
+            # Descargar PDF usando Streamlit sin tocar disco
+            st.download_button(
+                label="📄 Export to PDF",
+                data=pdf_buffer,
+                file_name="player_list.pdf",
+                mime="application/pdf"
+            )
