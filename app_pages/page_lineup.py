@@ -8,7 +8,6 @@ import pandas as pd
 import os
 from PIL import Image
 import matplotlib.pyplot as plt
-from io import BytesIO
 import uuid  
 import base64
 import streamlit.components.v1 as components
@@ -435,63 +434,40 @@ def page_lineup():
                 nombre = st.session_state["lineup_players"][idx]
                 ax.text(x, y+50, nombre, color="black", ha='center', va='top', fontsize=7)
 
-        # Guardar figura en memoria
-        img_buffer = BytesIO()
-        fig.savefig(img_buffer, format='png', bbox_inches='tight', dpi=150)
-        img_buffer.seek(0)
+        # Guardar figura temporalmente
+        temp_img_path = DATA_DIR / "lineup_temp.png"
+        fig.savefig(temp_img_path, bbox_inches='tight', dpi=150)
+        plt.close(fig)
 
         # Crear PDF
         pdf = FPDF()
         pdf.add_page()
-
-        # Registrar la fuente TTF Unicode usando la ruta de common
         pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
-
-        # Establecer fuente
         pdf.set_font("DejaVu", "", 12)
-        
-        # Obtener información del usuario y contexto desde session_state
+
         usuario = st.session_state.get("user","Desconocido")
         sistema = st.session_state.get("lineup_sistema","1-4-4-2")
         jornada = st.session_state.get("lineup_matchday",1)
-        
-        # Crear título para el PDF
         title = f"User: {usuario}        System: {sistema}       Matchday: {jornada}"
         pdf.cell(0, 10, title, ln=True, align="C")
         pdf.ln(5)
-        
-        # Insertar imagen en el PDF
-        pdf.image(img_buffer, x=15, w=180)  
-        
-        # Obtener logo para PDF
-        logo_buffer = get_watermark(alpha=10)
 
-        # Insertar encima del PDF
+        # Insertar la imagen
+        pdf.image(str(temp_img_path), x=15, w=180)
+
+        # Insertar logo
+        logo_buffer = get_watermark(alpha=10)
         pdf.image(logo_buffer, x=55, y=100, w=100)
 
-        # Guardar PDF en memoria
-        pdf_buffer = BytesIO()
-        pdf.output(pdf_buffer)
-        pdf_buffer.seek(0)
+        # Guardar PDF en disco
+        pdf_path = DATA_DIR / "lineup.pdf"
+        pdf.output(str(pdf_path))
 
-        # Convertir a base64 para usar en enlace HTML
-        pdf_base64 = base64.b64encode(pdf_buffer.read()).decode("utf-8")
-
-        # Botón rojo HTML para descargar PDF
-        components.html(
-            f"""
-            <a href="data:application/pdf;base64,{pdf_base64}" download="lineup.pdf">
-                <button style="
-                    padding:8px 14px;
-                    font-size:14px;
-                    cursor:pointer;
-                    background-color:#dc2626;
-                    color:white;
-                    border:none;
-                    border-radius:6px;">
-                    📄 Export to PDF
-                </button>
-            </a>
-            """,
-            height=55
-        )
+        # Botón para descargar PDF usando Streamlit
+        with open(pdf_path, "rb") as f:
+            st.download_button(
+                label="📄 Export to PDF",
+                data=f,
+                file_name="lineup.pdf",
+                mime="application/pdf"
+            )

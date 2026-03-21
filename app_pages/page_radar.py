@@ -612,8 +612,8 @@ def page_radar():
         # Configurar etiquetas y estilo
         ax.set_xticks(angles)
         ax.set_xticklabels(labels, fontsize=11)
-        ax.set_yticks(np.linspace(0, RADAR_MAX, 5))
-        ax.set_ylim(0, RADAR_MAX)
+        ax.set_yticks(np.linspace(0, 100, 5))
+        ax.set_ylim(0, 100)
         ax.grid(color='gray', linestyle='--', alpha=0.2)
         ax.legend(loc='upper right')
         

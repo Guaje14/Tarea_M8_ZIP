@@ -9,7 +9,6 @@ import os
 from PIL import Image
 from openpyxl import load_workbook
 import base64
-from io import BytesIO
 from fpdf import FPDF
 import streamlit.components.v1 as components
 
@@ -469,33 +468,29 @@ def page_list():
     )
     
     if not df_list.empty:
-        
+
         if st.button("⚙️ Prepare PDF"):
-        
+
             # Crear PDF
             pdf = FPDF()
             pdf.add_page()
-            
-            # Registrar la fuente TTF Unicode usando la ruta de common
-            pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
 
-            # Establecer fuente
+            # Registrar fuente Unicode
+            pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
             pdf.set_font("DejaVu", "", 12)
 
-            # Crear título para el PDF
+            # Título
             pdf.cell(0, 10, "Player List", ln=True, align="C")
             pdf.ln(5)
 
-            # Definir anchos de columna (ajusta según necesites)
+            # Columnas y encabezados
             col_widths = [50, 40, 40, 30, 30]  # Player, Team, League, Note, User
-
-            # Encabezado
             headers = ["Player", "Team", "League", "Note", "User"]
             for i, header in enumerate(headers):
                 pdf.cell(col_widths[i], 8, header, border=1, align="C")
             pdf.ln()
 
-            # Filas de jugadores
+            # Filas
             pdf.set_font("DejaVu", "", 10)
             for i, row in df_list.iterrows():
                 pdf.cell(col_widths[0], 8, str(row["Player"]), border=1)
@@ -505,35 +500,19 @@ def page_list():
                 pdf.cell(col_widths[4], 8, str(row["User"]), border=1)
                 pdf.ln()
 
-            # Obtener logo para PDF
+            # Insertar logo
             logo_buffer = get_watermark(alpha=10)
-
-            # Insertar encima del PDF
             pdf.image(logo_buffer, x=55, y=100, w=100)
-                        
-            # Guardar PDF en memoria
-            pdf_buffer = BytesIO()
-            pdf.output(pdf_buffer)
-            pdf_buffer.seek(0)
 
-            # Convertir a base64 para usar en enlace HTML
-            pdf_base64 = base64.b64encode(pdf_buffer.read()).decode("utf-8")
+            # Guardar PDF directamente en disco
+            pdf_path = DATA_DIR / "player_list.pdf"
+            pdf.output(str(pdf_path))
 
-            # Botón rojo HTML para descargar PDF
-            components.html(
-                f"""
-                <a href="data:application/pdf;base64,{pdf_base64}" download="player_list.pdf">
-                    <button style="
-                        padding:8px 14px;
-                        font-size:14px;
-                        cursor:pointer;
-                        background-color:#dc2626;
-                        color:white;
-                        border:none;
-                        border-radius:6px;">
-                        📄 Export to PDF
-                    </button>
-                </a>
-                """,
-                height=55
-            )
+            # Descargar PDF usando Streamlit
+            with open(pdf_path, "rb") as f:
+                st.download_button(
+                    label="📄 Export to PDF",
+                    data=f,
+                    file_name="player_list.pdf",
+                    mime="application/pdf"
+                )
