@@ -42,7 +42,7 @@ def generate_radar_matplotlib(rA_vals, rB_vals, selected_stats, playerA, playerB
     width = (2*np.pi / n) * 0.9
 
     # Crear figura y eje polar
-    fig, ax = plt.subplots(figsize=(5,5), subplot_kw=dict(polar=True))
+    fig, ax = plt.subplots(figsize=(6,6), subplot_kw=dict(polar=True))
 
     # Si el tipo de gráfico es comparar jugadores
     if chart_type_val == "Compare Players":
@@ -138,7 +138,7 @@ def generate_radar_matplotlib(rA_vals, rB_vals, selected_stats, playerA, playerB
     # Configuración de etiquetas de las estadísticas
     ax.set_xticks(angles)
     ax.set_xticklabels(selected_stats, fontsize=10)
-    ax.tick_params(axis='x', pad=15)
+    ax.tick_params(axis='x', pad=20)
 
     # Configuración de eje radial
     ax.set_yticks(range(0, 101, 20))    # Ticks cada 20 unidades
