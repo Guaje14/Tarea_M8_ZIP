@@ -368,7 +368,7 @@ def page_radar():
             valA = radar_df.loc[radar_df["Player"] == playerA, stat].values[0]
             valB = radar_df.loc[radar_df["Player"] == playerB, stat].values[0]
 
-            # Obtener minutos de cada jugador
+            # Obtener los minutos jugados para ambos jugadores
             minA = radar_df.loc[radar_df["Player"] == playerA, "stats_Min"].values[0]
             minB = radar_df.loc[radar_df["Player"] == playerB, "stats_Min"].values[0]
 
@@ -391,17 +391,32 @@ def page_radar():
 
             # Método Percentil: compara jugadores con su posición y rango de mínimos
             elif method_val == "Percentil":
-            
-                # Minutos jugados de los dos jugadores
-                minA = radar_df.loc[radar_df["Player"] == playerA, "stats_Min"].values[0]
-                minB = radar_df.loc[radar_df["Player"] == playerB, "stats_Min"].values[0]
+                
+                # Crear df_base solo con jugadores de la misma posición
+                df_baseA = radar_df[radar_df["stats_Pos"] == posA]
+                df_baseB = radar_df[radar_df["stats_Pos"] == posB]
 
-                # Calcular la "media de la media" (threshold)
-                threshold = (minA + minB) / 2 / 2  # es decir, un cuarto de la suma de minA+minB
+                # Calcular percentil del jugador A respecto a su posición
+                if not df_baseA.empty:
+                    rA = stats.percentileofscore(df_baseA[stat], valA, kind="rank")
+                else:
+                    rA = 50  # fallback si no hay jugadores
 
-                # Para cada estadística
-                for stat in selected_stats:
-                    
+                # Calcular percentil del jugador B respecto a su posición
+                if not df_baseB.empty:
+                    rB = stats.percentileofscore(df_baseB[stat], valB, kind="rank")
+                else:
+                    rB = 50  # fallback si no hay jugadores
+
+                # Guardar texto a mostrar (redondeado a entero)
+                textA.append(f"{rA:.0f}")
+                textB.append(f"{rB:.0f}")
+
+                r_min, r_max = 0, 100
+                
+            # Guardar valores normalizados para el radar
+            rA_vals.append(rA)
+            rB_vals.append(rB)
 
         # Configuración de ángulos y anchuras para el radar
         n = len(selected_stats)
