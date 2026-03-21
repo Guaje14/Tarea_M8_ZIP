@@ -484,9 +484,9 @@ def page_list():
             pdf_list.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
 
             # Título del PDF
-            pdf_list.set_font("DejaVu", "", 25)
+            pdf_list.set_font("DejaVu", "", 35)
             pdf_list.cell(0, 12, "List of Players", ln=True, align="C")  
-            pdf_list.ln(5)  
+            pdf_list.ln(10)  
 
             # Configurar fuente para cabecera de tabla
             pdf_list.set_font("DejaVu", "", 12)
