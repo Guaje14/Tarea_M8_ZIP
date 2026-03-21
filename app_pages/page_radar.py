@@ -15,6 +15,7 @@ from fpdf import FPDF
 from io import BytesIO
 import base64
 import matplotlib.pyplot as plt
+import tempfile
 
 # Importar rutas de configuración
 from common.config import (
@@ -563,7 +564,7 @@ def page_radar():
     """,
     height=55
     )                           
-    
+
     if st.button("⚙️ Prepare PDF") and chart_type_val and playerA and playerB:
 
         # Crear radar con Matplotlib
@@ -586,51 +587,51 @@ def page_radar():
         ax.set_xticklabels(labels)
         ax.legend(loc='upper right')
 
-        # Guardar imagen en buffer
-        radar_buffer = BytesIO()
-        plt.savefig(radar_buffer, format='PNG', bbox_inches='tight')
-        radar_buffer.seek(0)
-        plt.close(fig)  # cerrar figura para liberar memoria
+        # Guardar imagen en un archivo temporal
+        with tempfile.NamedTemporaryFile(suffix=".png") as tmpfile:
+            radar_image_path = tmpfile.name
+            plt.savefig(radar_image_path, format='PNG', bbox_inches='tight')
+            plt.close(fig)  # cerrar figura para liberar memoria
 
-        # Crear PDF
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
-        pdf.set_font("DejaVu", "", 12)
+            # Crear PDF
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
+            pdf.set_font("DejaVu", "", 12)
 
-        usuario = st.session_state.get("user", "Desconocido")
-        title = f"User: {usuario} | Radar Type: {chart_type_val} | Method: {method_val or 'N/A'}"
-        pdf.multi_cell(0, 10, title, align="C")
-        pdf.ln(5)
+            usuario = st.session_state.get("user", "Desconocido")
+            title = f"User: {usuario} | Radar Type: {chart_type_val} | Method: {method_val or 'N/A'}"
+            pdf.multi_cell(0, 10, title, align="C")
+            pdf.ln(5)
 
-        # Insertar radar en PDF
-        pdf.image(radar_buffer, x=15, w=180)
+            # Insertar radar en PDF usando la ruta temporal
+            pdf.image(radar_image_path, x=15, w=180)
 
-        # Insertar logo
-        logo_buffer = get_watermark(alpha=10)
-        pdf.image(logo_buffer, x=55, y=100, w=100)
+            # Insertar logo
+            logo_buffer = get_watermark(alpha=10)
+            pdf.image(logo_buffer, x=55, y=100, w=100)
 
-        # Guardar PDF en memoria
-        pdf_buffer = BytesIO()
-        pdf.output(pdf_buffer)
-        pdf_buffer.seek(0)
+            # Guardar PDF en memoria
+            pdf_buffer = BytesIO()
+            pdf.output(pdf_buffer)
+            pdf_buffer.seek(0)
 
-        # Descargar PDF
-        pdf_base64 = base64.b64encode(pdf_buffer.read()).decode("utf-8")
-        components.html(
-            f"""
-            <a href="data:application/pdf;base64,{pdf_base64}" download="radar.pdf">
-                <button style="
-                    padding:8px 14px;
-                    font-size:14px;
-                    cursor:pointer;
-                    background-color:#dc2626;
-                    color:white;
-                    border:none;
-                    border-radius:6px;">
-                    📄 Export Radar to PDF
-                </button>
-            </a>
-            """,
-            height=55
-        )
+            # Descargar PDF
+            pdf_base64 = base64.b64encode(pdf_buffer.read()).decode("utf-8")
+            components.html(
+                f"""
+                <a href="data:application/pdf;base64,{pdf_base64}" download="radar.pdf">
+                    <button style="
+                        padding:8px 14px;
+                        font-size:14px;
+                        cursor:pointer;
+                        background-color:#dc2626;
+                        color:white;
+                        border:none;
+                        border-radius:6px;">
+                        📄 Export Radar to PDF
+                    </button>
+                </a>
+                """,
+                height=55
+            )
