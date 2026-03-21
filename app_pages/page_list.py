@@ -476,13 +476,13 @@ def page_list():
             pdf.add_page()
 
             pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
-            pdf.set_font("DejaVu", "", 12)
+            pdf.set_font("DejaVu", "", 9)
 
             pdf.cell(0, 10, "Player List", ln=True, align="C")
             pdf.ln(5)
 
-            col_widths = [50, 40, 40, 30, 30]
-            headers = ["Player", "Team", "League", "Note", "User"]
+            col_widths = [25, 15, 15, 5, 5, 30, 5]
+            headers = ["Player", "Team", "League", "Position", "List", "Note", "User"]
 
             for i, header in enumerate(headers):
                 pdf.cell(col_widths[i], 8, header, border=1, align="C")
@@ -493,6 +493,7 @@ def page_list():
                 pdf.cell(col_widths[0], 8, str(row["Player"]), border=1)
                 pdf.cell(col_widths[1], 8, str(row["Team"]), border=1)
                 pdf.cell(col_widths[2], 8, str(row["League"]), border=1)
+                pdf.cell
                 pdf.cell(col_widths[3], 8, str(row["Note"]), border=1)
                 pdf.cell(col_widths[4], 8, str(row["User"]), border=1)
                 pdf.ln()
