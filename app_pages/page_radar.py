@@ -392,19 +392,16 @@ def page_radar():
             # Método Percentil: compara jugadores con su posición y rango de mínimos
             elif method_val == "Percentil":
                 
-                # Calcular promedio de minutos entre ambos jugadores
                 min_avg = (minA + minB) / 2
-                
-                # df_baseA: mismos stats_Pos y mins >= min_avg
-                df_baseA = radar_df[(radar_df["stats_Pos"] == posA) & (radar_df["stats_Min"] >= min_avg)]
-                
-                # df_baseB: mismos stats_Pos y mins >= min_avg
-                df_baseB = radar_df[(radar_df["stats_Pos"] == posB) & (radar_df["stats_Min"] >= min_avg)]
 
-                # Calcular percentiles
+                # Comparación solo por minutos, sin filtrar por posición
+                df_baseA = radar_df[radar_df["stats_Min"] >= min_avg]
+                df_baseB = radar_df[radar_df["stats_Min"] >= min_avg]
+
+                # Percentiles
                 rA = stats.percentileofscore(df_baseA[stat], valA, kind="rank") if not df_baseA.empty else 50
                 rB = stats.percentileofscore(df_baseB[stat], valB, kind="rank") if not df_baseB.empty else 50
-
+                
                 # Texto a mostrar
                 textA.append(f"{rA:.0f}")
                 textB.append(f"{rB:.0f}")
