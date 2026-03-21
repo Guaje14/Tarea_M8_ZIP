@@ -470,7 +470,7 @@ def page_lineup():
         title = f"Username: {usuario}    System: {sistema}    Matchday: {jornada}"
 
         # Título del PDF
-        pdf_lineup.set_font("DejaVu", "", 18)
+        pdf_lineup.set_font("DejaVu", "", 16)
         pdf_lineup.cell(0, 12, title, ln=True, align="C")
         pdf_lineup.ln(8)  
 

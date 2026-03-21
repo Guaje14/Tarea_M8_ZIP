@@ -7,7 +7,6 @@ matplotlib
 plotly
 numpy
 openpyxl
-kaleido
 python-dotenv
 IPython
 scipy
