@@ -574,7 +574,9 @@ def page_radar():
             selected_stats=selected_stats,
             playerA=playerA,
             playerB=playerB,
-            chart_type_val=chart_type_val
+            chart_type_val=chart_type_val,
+            textA=textA,
+            textB=textB
         )
 
         # Guardar figura en memoria como PNG

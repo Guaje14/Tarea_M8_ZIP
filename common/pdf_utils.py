@@ -30,7 +30,7 @@ def get_watermark(alpha: int = 30, logo_filename: str = "Logo_app_StreamlitM8.pn
     return tmp_file.name
 
 # Función para generar un radar según el tipo y método seleccionado
-def generate_radar_matplotlib(rA_vals, rB_vals, selected_stats, playerA, playerB, chart_type_val):
+def generate_radar_matplotlib(rA_vals, rB_vals, selected_stats, playerA, playerB, chart_type_val, textA, textB):
 
     # Número de estadísticas a graficar
     n = len(selected_stats)  
@@ -44,7 +44,7 @@ def generate_radar_matplotlib(rA_vals, rB_vals, selected_stats, playerA, playerB
     rB_plot = rB_vals + rB_vals[:1]
 
     # Crear figura y eje polar 
-    fig, ax = plt.subplots(figsize=(6,6), subplot_kw=dict(polar=True))
+    fig, ax = plt.subplots(figsize=(5,5), subplot_kw=dict(polar=True))
 
     if chart_type_val == "Compare Players":
         
@@ -55,8 +55,21 @@ def generate_radar_matplotlib(rA_vals, rB_vals, selected_stats, playerA, playerB
         # Jugador B
         ax.plot(angles, rB_plot, color="#d62728", linewidth=2, label=playerB)
         ax.fill(angles, rB_plot, color="#d62728", alpha=0.25)
+        
+        if textA and textB:
+            for i in range(n):
+                angle = angles[i]
+
+                ax.text(angle, rA_vals[i] + 5, textA[i],
+                        color="#1f77b4", fontsize=9, ha="center", va="center")
+
+                ax.text(angle, rB_vals[i] + 10, textB[i],
+                        color="#d62728", fontsize=9, ha="center", va="center")
 
     elif chart_type_val == "The Best Player":
+        
+        plotted_players = set()
+        
         for i in range(n):
             
             # Determinar cuál jugador tiene mejor valor
@@ -64,20 +77,37 @@ def generate_radar_matplotlib(rA_vals, rB_vals, selected_stats, playerA, playerB
                 val = rA_vals[i]
                 color = "#1f77b4"
                 name = playerA
+                text = textA[i] if textA else ""
             else:
                 val = rB_vals[i]
                 color = "#d62728"
                 name = playerB
+                text = textB[i] if textB else ""
+            
+            label = name if name not in plotted_players else None
+            plotted_players.add(name)
 
-            # Dibujar línea desde 0 hasta el valor del jugador destacado
-            ax.plot([angles[i], angles[i]], [0, val], color=color, linewidth=4)
+            ax.plot([angles[i], angles[i]], [0, val],
+                    color=color, linewidth=4, label=label)
+
+            ax.text(angles[i], val + 5, text,
+                    color="black", fontsize=9,
+                    ha="center", va="center")
 
     # Configurar etiquetas y ticks 
-    ax.set_xticks(angles[:-1])                
+    ax.set_xticks(angles[:-1])
     ax.set_xticklabels(selected_stats, fontsize=10)
-    ax.set_yticks(range(0, 101, 20))         
-    ax.set_ylim(0, 100)                       
-    ax.grid(True)                             
-    ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1))  
 
-    return fig  
+    ax.set_yticks(range(0, 101, 20))
+    ax.set_ylim(0, 100)
+
+    ax.grid(True)
+
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.15),
+        ncol=2,
+        frameon=False
+    )
+
+    return fig
