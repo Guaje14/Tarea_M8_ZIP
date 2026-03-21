@@ -427,8 +427,6 @@ def page_radar():
                     # Guardar siempre valores y textos para el radar
                     rA_vals.append(rA)
                     rB_vals.append(rB)
-                    textA.append(f"{rA:.0f}")
-                    textB.append(f"{rB:.0f}")
 
         # Configuración de ángulos y anchuras para el radar
         n = len(selected_stats)
