@@ -81,7 +81,14 @@ def page_newleague():
                 df_final.to_excel(writer, index=False)
 
     # Esta función devuelve un diccionario con todas las ligas posibles para distintas fuentes
-    ligas = get_possible_leagues('Copa de la Liga', '2023', 'Fbref')
+    @st.cache_data(show_spinner=False)
+    def load_leagues():
+        try:
+            return get_possible_leagues('Copa de la Liga', '2023', 'Fbref')
+        except Exception:
+            return {"Fbref": {}}
+    
+    ligas = ligas = load_leagues()
 
     # Filtrar solo las ligas de FBref
     ligas_fbref = ligas["Fbref"]

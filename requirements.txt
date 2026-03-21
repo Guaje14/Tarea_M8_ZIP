@@ -12,3 +12,5 @@ webdriver-manager
 kaleido
 python-dotenv
 IPython
+scipy
+selenium
