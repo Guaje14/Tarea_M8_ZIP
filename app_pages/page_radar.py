@@ -577,39 +577,39 @@ def page_radar():
         # -----------------------------
         # Crear PDF
         # -----------------------------
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
-        pdf.set_font("DejaVu", "", 12)
+        pdf_radar = FPDF()
+        pdf_radar.add_page()
+        pdf_radar.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
+        pdf_radar.set_font("DejaVu", "", 12)
 
-        usuario = st.session_state.get("user").username if st.session_state.get("user") else "Desconocido"
-        title = f"User: {usuario} | Radar Type: {chart_type_val} | Method: {method_val or 'N/A'}"
-        pdf.multi_cell(0, 10, title, align="C")
-        pdf.ln(5)
+        usuario_radar = st.session_state.get("user").username if st.session_state.get("user") else "Desconocido"
+        title_radar = f"User: {usuario_radar} | Radar Type: {chart_type_val} | Method: {method_val or 'N/A'}"
+        pdf_radar.multi_cell(0, 10, title_radar, align="C")
+        pdf_radar.ln(5)
 
         # -----------------------------
         # Insertar radar desde BytesIO
         # -----------------------------
-        pdf.image(radar_buffer, x=15, w=180)  # w=180 ajusta ancho del radar
+        pdf_radar.image(radar_buffer, x=15, w=180)  # w=180 ajusta ancho del radar
 
         # -----------------------------
         # Insertar logo de marca de agua
         # -----------------------------
-        logo_path = get_watermark(alpha=10)
-        pdf.image(logo_path, x=55, y=100, w=100)
+        logo_path_radar = get_watermark(alpha=10)
+        pdf_radar.image(logo_path_radar, x=55, y=100, w=100)
 
         # -----------------------------
         # Generar PDF en memoria como bytes
         # -----------------------------
-        pdf_bytes = pdf.output(dest="S").encode("latin-1")
-        pdf_base64 = base64.b64encode(pdf_bytes).decode("utf-8")
+        pdf_bytes_radar = pdf_radar.output(dest="S")
+        pdf_base64_radar = base64.b64encode(pdf_bytes_radar).decode("utf-8")
 
         # -----------------------------
         # Descargar PDF desde Streamlit
         # -----------------------------
         components.html(
             f"""
-            <a href="data:application/pdf;base64,{pdf_base64}" download="radar.pdf">
+            <a href="data:application/pdf;base64,{pdf_base64_radar}" download="radar.pdf">
                 <button style="
                     padding:8px 14px;
                     font-size:14px;
