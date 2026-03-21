@@ -15,6 +15,7 @@ from fpdf import FPDF
 import io
 import base64
 import matplotlib.pyplot as plt
+import plotly.io as pio
 
 # Importar rutas de configuración
 from common.config import (
@@ -566,13 +567,13 @@ def page_radar():
 
     if st.button("⚙️ Prepare PDF") and chart_type_val and playerA and playerB:
 
-        # -----------------------------
-        # Guardar la figura del radar existente en memoria
+            # -----------------------------
+        # Guardar la figura Plotly en memoria
         # -----------------------------
         radar_buffer = io.BytesIO()
-        plt.savefig(radar_buffer, format="PNG", bbox_inches="tight")
-        radar_buffer.seek(0)  # mover el cursor al inicio
-        plt.close()  # cerrar figura para liberar memoria
+        # Exporta el Plotly figure a PNG en memoria (requiere kaleido)
+        pio.write_image(fig, radar_buffer, format="png", width=800, height=800, scale=2)
+        radar_buffer.seek(0)  # mover cursor al inicio
 
         # -----------------------------
         # Crear PDF
@@ -601,7 +602,7 @@ def page_radar():
         # -----------------------------
         # Generar PDF en memoria como bytes
         # -----------------------------
-        pdf_bytes_radar = pdf_radar.output(dest="S")
+        pdf_bytes_radar = pdf_radar.output(dest="S").encode("latin-1")
         pdf_base64_radar = base64.b64encode(pdf_bytes_radar).decode("utf-8")
 
         # -----------------------------
