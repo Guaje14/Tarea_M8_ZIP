@@ -392,23 +392,20 @@ def page_radar():
             # Método Percentil: compara jugadores con su posición y rango de mínimos
             elif method_val == "Percentil":
                 
-                # Crear df_base solo con jugadores de la misma posición
-                df_baseA = radar_df[radar_df["stats_Pos"] == posA]
-                df_baseB = radar_df[radar_df["stats_Pos"] == posB]
+                # Calcular promedio de minutos entre ambos jugadores
+                min_avg = (minA + minB) / 2
+                
+                # df_baseA: mismos stats_Pos y mins >= min_avg
+                df_baseA = radar_df[(radar_df["stats_Pos"] == posA) & (radar_df["stats_Min"] >= min_avg)]
+                
+                # df_baseB: mismos stats_Pos y mins >= min_avg
+                df_baseB = radar_df[(radar_df["stats_Pos"] == posB) & (radar_df["stats_Min"] >= min_avg)]
 
-                # Calcular percentil del jugador A respecto a su posición
-                if not df_baseA.empty:
-                    rA = stats.percentileofscore(df_baseA[stat], valA, kind="rank")
-                else:
-                    rA = 50  # fallback si no hay jugadores
+                # Calcular percentiles
+                rA = stats.percentileofscore(df_baseA[stat], valA, kind="rank") if not df_baseA.empty else 50
+                rB = stats.percentileofscore(df_baseB[stat], valB, kind="rank") if not df_baseB.empty else 50
 
-                # Calcular percentil del jugador B respecto a su posición
-                if not df_baseB.empty:
-                    rB = stats.percentileofscore(df_baseB[stat], valB, kind="rank")
-                else:
-                    rB = 50  # fallback si no hay jugadores
-
-                # Guardar texto a mostrar (redondeado a entero)
+                # Texto a mostrar
                 textA.append(f"{rA:.0f}")
                 textB.append(f"{rB:.0f}")
 
