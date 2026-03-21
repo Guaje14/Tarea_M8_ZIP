@@ -563,38 +563,15 @@ def page_radar():
     """,
     height=55
     )                           
-
     if st.button("⚙️ Prepare PDF") and chart_type_val and playerA and playerB:
 
         # -----------------------------
-        # Crear radar con Matplotlib
-        # -----------------------------
-        labels = selected_stats
-        rA = rA_vals
-        rB = rB_vals
-
-        # Convertir ángulos a radianes
-        angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False)
-        rA = np.concatenate((rA, [rA[0]]))
-        rB = np.concatenate((rB, [rB[0]]))
-        angles = np.concatenate((angles, [angles[0]]))
-
-        fig, ax = plt.subplots(figsize=(6,6), subplot_kw=dict(polar=True))
-        ax.plot(angles, rA, 'b-o', label=playerA)
-        ax.plot(angles, rB, 'r-o', label=playerB)
-        ax.fill(angles, rA, 'b', alpha=0.25)
-        ax.fill(angles, rB, 'r', alpha=0.25)
-        ax.set_xticks(angles[:-1])
-        ax.set_xticklabels(labels)
-        ax.legend(loc='upper right')
-
-        # -----------------------------
-        # Guardar radar en archivo temporal
+        # Guardar radar de Plotly en archivo temporal con Kaleido
         # -----------------------------
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
             radar_image_path = tmpfile.name
-            plt.savefig(radar_image_path, format='PNG', bbox_inches='tight')
-        plt.close(fig)
+            # Guardamos la figura que ya está en el placeholder
+            fig.write_image(radar_image_path, engine="kaleido")
 
         # -----------------------------
         # Crear PDF
