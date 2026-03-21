@@ -398,12 +398,12 @@ def page_radar():
                 # Filtrar la muestra (df_base) por posición y minutos
                 df_baseA = radar_df[
                     (radar_df["stats_Pos"] == posA) &
-                    (radar_df["minutes_played"] >= min_avg)
+                    (radar_df["stats_Min"] >= min_avg)
                 ]
 
                 df_baseB = radar_df[
                     (radar_df["stats_Pos"] == posB) &
-                    (radar_df["minutes_played"] >= min_avg)
+                    (radar_df["stats_Min"] >= min_avg)
                 ]
                 
                 # Normalizar la estadística a 90 minutos
@@ -412,12 +412,12 @@ def page_radar():
                 
                 # Calcular el percentil
                 if not df_baseA.empty:
-                    rA = stats.percentileofscore(df_baseA[stat] / df_baseA["minutes_played"] * 90, valA_norm, kind="rank")
+                    rA = stats.percentileofscore(df_baseA[stat] / df_baseA["stats_Min"] * 90, valA_norm, kind="rank")
                 else:
                     rA = 50
 
                 if not df_baseB.empty:
-                    rB = stats.percentileofscore(df_baseB[stat] / df_baseB["minutes_played"] * 90, valB_norm, kind="rank")
+                    rB = stats.percentileofscore(df_baseB[stat] / df_baseB["stats_Min"] * 90, valB_norm, kind="rank")
                 else:
                     rB = 50
                 
