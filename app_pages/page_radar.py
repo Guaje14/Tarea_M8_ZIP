@@ -596,7 +596,7 @@ def page_radar():
         pdf_radar.ln(5)
 
         # Insertar gráfico generado en el PDF
-        pdf_radar.image(radar_buffer, x=15, w=90)
+        pdf_radar.image(radar_buffer, x=15, w=100)
 
         # -----------------------------
         # Insertar marca de agua opcional

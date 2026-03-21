@@ -46,7 +46,7 @@ def generate_radar_matplotlib(
     # Ancho de cada porción
     width = (2*np.pi / n) * 0.9
 
-    fig, ax = plt.subplots(figsize=(4,4), subplot_kw=dict(polar=True))
+    fig, ax = plt.subplots(figsize=(5,5), subplot_kw=dict(polar=True))
 
     # =========================
     # COMPARE PLAYERS (PIZZA)
@@ -141,7 +141,7 @@ def generate_radar_matplotlib(
     # ESTILO
     # =========================
     ax.set_xticks(angles)
-    ax.set_xticklabels(selected_stats, fontsize=10)
+    ax.set_xticklabels(selected_stats, fontsize=10, labelpad=15)
 
     ax.set_yticks(range(0, 101, 20))
     ax.set_ylim(0, 100)
