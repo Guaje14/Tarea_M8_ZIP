@@ -581,7 +581,7 @@ def page_radar():
 
         # Guardar figura en memoria como PNG
         radar_buffer = io.BytesIO()
-        fig_mat.savefig(radar_buffer, format="png", bbox_inches='tight', dpi=150)
+        fig_mat.savefig(radar_buffer, format="png", bbox_inches='tight', dpi=200)
         plt.close(fig_mat)  # cerrar la figura para liberar memoria
         radar_buffer.seek(0)
 
@@ -596,7 +596,7 @@ def page_radar():
         pdf_radar.ln(5)
 
         # Insertar gráfico generado en el PDF
-        pdf_radar.image(radar_buffer, x=15, w=140)
+        pdf_radar.image(radar_buffer, x=15, w=90)
 
         # -----------------------------
         # Insertar marca de agua opcional
