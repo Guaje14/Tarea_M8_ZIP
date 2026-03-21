@@ -14,6 +14,7 @@ import streamlit.components.v1 as components
 from fpdf import FPDF
 from io import BytesIO
 import base64
+import plotly.io as pio
 
 # Importar rutas de configuración
 from common.config import (
@@ -566,7 +567,7 @@ def page_radar():
     if st.button("⚙️ Prepare PDF") and chart_type_val and playerA and playerB:
 
         # Convertir gráfico de Plotly a imagen PNG en memoria
-        radar_png = fig.to_image(format="png", width=800, height=600, scale=2)
+        radar_png = pio.to_image(fig, format="png", width=800, height=600, scale=2, engine="kaleido")
         radar_buffer = BytesIO(radar_png)
 
         # Crear PDF
