@@ -12,9 +12,9 @@ from scipy import stats
 import pandas as pd
 import streamlit.components.v1 as components
 from fpdf import FPDF
+import io
 import base64
 import matplotlib.pyplot as plt
-import tempfile
 
 # Importar rutas de configuración
 from common.config import (
@@ -552,7 +552,7 @@ def page_radar():
     """
     <button onclick="parent.window.print()" style="
         padding:8px 14px;
-        font-size:16px;
+        font-size:14px;
         cursor:pointer;
         background-color:#2563eb;
         color:white;
@@ -567,64 +567,13 @@ def page_radar():
     if st.button("⚙️ Prepare PDF") and chart_type_val and playerA and playerB:
 
         # -----------------------------
-        # Crear radar con Matplotlib
+        # Guardar la figura del radar existente en memoria
         # -----------------------------
-        labels = selected_stats
-        rA = rA_vals.copy()
-        rB = rB_vals.copy()
-        n = len(labels)
-        
-        # Convertir ángulos a radianes
-        angles = np.linspace(0, 2 * np.pi, n, endpoint=False)
-        angles_full = np.concatenate((angles, [angles[0]]))
-        rA_full = np.concatenate((rA, [rA[0]]))
-        rB_full = np.concatenate((rB, [rB[0]]))
-        
-        fig, ax = plt.subplots(figsize=(6,6), subplot_kw=dict(polar=True))
-        
-        if chart_type_val == "Compare Players":
-            # Opacidades según quién gana
-            opacities_A = [0.85 if a>=b else 0.5 for a,b in zip(rA, rB)]
-            opacities_B = [0.85 if b>=a else 0.5 for a,b in zip(rA, rB)]
-            
-            # Dibujar líneas y relleno
-            ax.plot(angles_full, rA_full, '-o', color='#1f77b4', label=playerA)
-            ax.plot(angles_full, rB_full, '-o', color='#d62728', label=playerB)
-            ax.fill(angles_full, rA_full, color='#1f77b4', alpha=0.25)
-            ax.fill(angles_full, rB_full, color='#d62728', alpha=0.25)
-            
-            # Agregar valores sobre cada barra
-            for i in range(n):
-                ax.text(angles[i], rA[i]+5, f"{textA[i]}", color="#1f77b4", ha='center', va='bottom', fontsize=10)
-                ax.text(angles[i], rB[i]+5, f"{textB[i]}", color="#d62728", ha='center', va='bottom', fontsize=10)
-        
-        elif chart_type_val == "The Best Player":
-            # Dibujar solo el jugador que gana en cada stat
-            for i in range(n):
-                if rA[i] >= rB[i]:
-                    val, color, text, player_name = rA[i], '#1f77b4', textA[i], playerA
-                else:
-                    val, color, text, player_name = rB[i], '#d62728', textB[i], playerB
-                ax.plot([angles[i], angles[i]], [0, val], '-', color=color, lw=4)
-                ax.plot(angles[i], val, 'o', color=color)
-                ax.text(angles[i], val + 5, text, color='black', ha='center', va='bottom', fontsize=10)
-        
-        # Configurar etiquetas y estilo
-        ax.set_xticks(angles)
-        ax.set_xticklabels(labels, fontsize=11)
-        ax.set_yticks(np.linspace(0, 100, 5))
-        ax.set_ylim(0, 100)
-        ax.grid(color='gray', linestyle='--', alpha=0.2)
-        ax.legend(loc='upper right')
-        
-        # -----------------------------
-        # Guardar radar en archivo temporal
-        # -----------------------------
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
-            radar_image_path = tmpfile.name
-            plt.savefig(radar_image_path, format='PNG', bbox_inches='tight')
-        plt.close(fig)
-        
+        radar_buffer = io.BytesIO()
+        plt.savefig(radar_buffer, format="PNG", bbox_inches="tight")
+        radar_buffer.seek(0)  # mover el cursor al inicio
+        plt.close()  # cerrar figura para liberar memoria
+
         # -----------------------------
         # Crear PDF
         # -----------------------------
@@ -638,27 +587,26 @@ def page_radar():
         pdf.multi_cell(0, 10, title, align="C")
         pdf.ln(5)
 
-        # Insertar radar
-        pdf.image(radar_image_path, x=15, w=180)
+        # -----------------------------
+        # Insertar radar desde BytesIO
+        # -----------------------------
+        pdf.image(radar_buffer, x=15, w=180)  # w=180 ajusta ancho del radar
 
-        # Insertar logo
+        # -----------------------------
+        # Insertar logo de marca de agua
+        # -----------------------------
         logo_path = get_watermark(alpha=10)
         pdf.image(logo_path, x=55, y=100, w=100)
 
         # -----------------------------
-        # Guardar PDF en archivo temporal
+        # Generar PDF en memoria como bytes
         # -----------------------------
-        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp_pdf:
-            pdf_path = tmp_pdf.name
-            pdf.output(pdf_path)
-
-        # -----------------------------
-        # Descargar PDF usando enlace base64
-        # -----------------------------
-        with open(pdf_path, "rb") as f:
-            pdf_bytes = f.read()
+        pdf_bytes = pdf.output(dest="S").encode("latin-1")
         pdf_base64 = base64.b64encode(pdf_bytes).decode("utf-8")
 
+        # -----------------------------
+        # Descargar PDF desde Streamlit
+        # -----------------------------
         components.html(
             f"""
             <a href="data:application/pdf;base64,{pdf_base64}" download="radar.pdf">
