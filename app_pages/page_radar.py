@@ -392,6 +392,7 @@ def page_radar():
             # Método Percentil: compara jugadores con su posición y rango de mínimos
             elif method_val == "Percentil":
                 
+                # Calcular promedio de minutos entre ambos jugadores
                 min_avg = (minA + minB) / 2
 
                 # Comparación solo por minutos, sin filtrar por posición
