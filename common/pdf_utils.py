@@ -46,7 +46,7 @@ def generate_radar_matplotlib(
     # Ancho de cada porción
     width = (2*np.pi / n) * 0.9
 
-    fig, ax = plt.subplots(figsize=(5,5), subplot_kw=dict(polar=True))
+    fig, ax = plt.subplots(figsize=(3,3), subplot_kw=dict(polar=True))
 
     # =========================
     # COMPARE PLAYERS (PIZZA)
