@@ -519,7 +519,7 @@ def page_list():
             pdf_list.image(logo_buffer_list, x=55, y=100, w=100)
 
             # Generar PDF en memoria como bytes
-            pdf_bytes_list = pdf_list.output_bytes()  # ✅ Método moderno de fpdf2
+            pdf_bytes_list = pdf_list.output(dest="S")  
 
             # Codificar PDF en base64 para descarga en navegador
             b64_list = base64.b64encode(pdf_bytes_list).decode()
