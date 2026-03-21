@@ -14,6 +14,7 @@ import streamlit.components.v1 as components
 from fpdf import FPDF
 from io import BytesIO
 import base64
+import matplotlib.pyplot as plt
 
 # Importar rutas de configuración
 from common.config import (
@@ -565,38 +566,48 @@ def page_radar():
     
     if st.button("⚙️ Prepare PDF") and chart_type_val and playerA and playerB:
 
-        # Convertir Plotly a PNG en memoria (sin engine)
-        img_bytes = fig.to_image(format="png", width=800, height=600, scale=2)
-        radar_image = Image.open(BytesIO(img_bytes))
+        # Crear radar con Matplotlib
+        labels = selected_stats
+        rA = rA_vals
+        rB = rB_vals
+
+        # Convertir ángulos a radianes
+        angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False)
+        rA = np.concatenate((rA, [rA[0]]))
+        rB = np.concatenate((rB, [rB[0]]))
+        angles = np.concatenate((angles, [angles[0]]))
+
+        fig, ax = plt.subplots(figsize=(6,6), subplot_kw=dict(polar=True))
+        ax.plot(angles, rA, 'b-o', label=playerA)
+        ax.plot(angles, rB, 'r-o', label=playerB)
+        ax.fill(angles, rA, 'b', alpha=0.25)
+        ax.fill(angles, rB, 'r', alpha=0.25)
+        ax.set_xticks(angles[:-1])
+        ax.set_xticklabels(labels)
+        ax.legend(loc='upper right')
+
+        # Guardar imagen en buffer
+        radar_buffer = BytesIO()
+        plt.savefig(radar_buffer, format='PNG', bbox_inches='tight')
+        radar_buffer.seek(0)
+        plt.close(fig)  # cerrar figura para liberar memoria
 
         # Crear PDF
         pdf = FPDF()
         pdf.add_page()
-
-        # Registrar la fuente TTF Unicode usando la ruta de common
         pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
-
-        # Establecer fuente
         pdf.set_font("DejaVu", "", 12)
 
-        # Crear título para el PDF
         usuario = st.session_state.get("user", "Desconocido")
         title = f"User: {usuario} | Radar Type: {chart_type_val} | Method: {method_val or 'N/A'}"
         pdf.multi_cell(0, 10, title, align="C")
         pdf.ln(5)
 
-        # Guardar la imagen en un buffer para FPDF
-        radar_buffer = BytesIO()
-        radar_image.save(radar_buffer, format="PNG")
-        radar_buffer.seek(0)
-
-        # Insertar la imagen en el PDF
+        # Insertar radar en PDF
         pdf.image(radar_buffer, x=15, w=180)
 
-        # Obtener logo para PDF
+        # Insertar logo
         logo_buffer = get_watermark(alpha=10)
-
-        # Insertar encima del PDF
         pdf.image(logo_buffer, x=55, y=100, w=100)
 
         # Guardar PDF en memoria
@@ -604,10 +615,8 @@ def page_radar():
         pdf.output(pdf_buffer)
         pdf_buffer.seek(0)
 
-        # Convertir a base64 para enlace de descarga
+        # Descargar PDF
         pdf_base64 = base64.b64encode(pdf_buffer.read()).decode("utf-8")
-
-        # Botón HTML para descargar PDF
         components.html(
             f"""
             <a href="data:application/pdf;base64,{pdf_base64}" download="radar.pdf">
