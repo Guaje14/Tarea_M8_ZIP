@@ -12,7 +12,6 @@ from scipy import stats
 import pandas as pd
 import streamlit.components.v1 as components
 from fpdf import FPDF
-from io import BytesIO
 import base64
 import matplotlib.pyplot as plt
 import tempfile
@@ -605,7 +604,7 @@ def page_radar():
         pdf.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
         pdf.set_font("DejaVu", "", 12)
 
-        usuario = st.session_state.get("user", "Desconocido")
+        usuario = st.session_state.get("user").username if st.session_state.get("user") else "Desconocido"
         title = f"User: {usuario} | Radar Type: {chart_type_val} | Method: {method_val or 'N/A'}"
         pdf.multi_cell(0, 10, title, align="C")
         pdf.ln(5)
@@ -618,14 +617,19 @@ def page_radar():
         pdf.image(logo_path, x=55, y=100, w=100)
 
         # -----------------------------
-        # Guardar PDF en memoria
+        # Guardar PDF en archivo temporal
         # -----------------------------
-        pdf_buffer = BytesIO()
-        pdf.output(pdf_buffer)
-        pdf_buffer.seek(0)
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp_pdf:
+            pdf_path = tmp_pdf.name
+            pdf.output(pdf_path)
 
-        # Descargar PDF
-        pdf_base64 = base64.b64encode(pdf_buffer.read()).decode("utf-8")
+        # -----------------------------
+        # Descargar PDF usando enlace base64
+        # -----------------------------
+        with open(pdf_path, "rb") as f:
+            pdf_bytes = f.read()
+        pdf_base64 = base64.b64encode(pdf_bytes).decode("utf-8")
+
         components.html(
             f"""
             <a href="data:application/pdf;base64,{pdf_base64}" download="radar.pdf">

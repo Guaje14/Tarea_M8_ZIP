@@ -195,11 +195,11 @@ def page_newleague():
             # Si todo es correcto, crear el diccionario con la información del mensaje
             else:
                 data = {
-                    "User": st.session_state.get("user"),  # Usuario que envía el mensaje
-                    "League": selected_league,            # Liga solicitada
-                    "Priority": priority,                 # Nivel de prioridad
-                    "Message": message,                   # Justificación
-                    "Date": datetime.now().strftime("%Y-%m-%d %H:%M")  # Fecha y hora actual
+                    "User": st.session_state.get("user").username,    # Usuario que envía el mensaje
+                    "League": selected_league,                        # Liga solicitada
+                    "Priority": priority,                             # Nivel de prioridad
+                    "Message": message,                               # Justificación
+                    "Date": datetime.now().strftime("%Y-%m-%d %H:%M") # Fecha y hora actual
                 }
 
                 # Guardar el mensaje en el Excel correspondiente
