@@ -421,12 +421,12 @@ def page_lineup():
     # Botón en Streamlit para preparar PDF del lineup
     if st.button("⚙️ Prepare PDF"):
 
-        # Crear figura con tamaño vertical
+        # Crear figura con tamaño vertical del campo       
         fig_lineup, ax_lineup = plt.subplots(figsize=(6,9))  
         
         # Mostrar imagen de campo de fútbol
         ax_lineup.imshow(lineup_pitch_img)                   
-        ax_lineup.axis("off") # Ocultar ejes
+        ax_lineup.axis("off")  # Ocultar ejes
 
         # Dibujar jugadores y nombres en el campo
         for idx, pos in enumerate(lineup_pos_coords):
@@ -451,54 +451,51 @@ def page_lineup():
         img_buffer = BytesIO()
         fig_lineup.savefig(img_buffer, format="png", bbox_inches='tight', dpi=150)  
         plt.close(fig_lineup)  
-        img_buffer.seek(0)     
+        img_buffer.seek(0)  # Rewind del buffer
 
         # Crear objeto PDF
         pdf_lineup = FPDF()
         
         # Añadir una página al documento
-        pdf_lineup.add_page()
+        pdf_lineup.add_page()  
         
         # Añadir fuente personalizada 
-        pdf_lineup.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)  # Fuente unicode
-        
-        # Tamaño de la Fuente
-        pdf_lineup.set_font("DejaVu", "", 12)
+        pdf_lineup.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)  
 
-        # Información del usuario y datos de la alineación
+        # Información del usuario y alineación
         user_obj = st.session_state.get("user")
-        usuario = user_obj.username if user_obj else "Desconocido"
+        usuario = user_obj.username if user_obj else "Desconocido"  
         sistema = st.session_state.get("lineup_sistema","1-4-4-2")
         jornada = st.session_state.get("lineup_matchday",1)
-        title = f"User: {usuario}    System: {sistema}    Matchday: {jornada}"
+        title = f"Username: {usuario}    System: {sistema}    Matchday: {jornada}"
 
-        # Título del PDF
-        pdf_lineup.set_font("DejaVu", "", 14)  # Fuente más grande
+        # Título del PDF c
+        pdf_lineup.set_font("DejaVu", "", 25)
         pdf_lineup.cell(0, 12, title, ln=True, align="C")
-        pdf_lineup.ln(5)
+        pdf_lineup.ln(8)  
 
-        # Insertar imagen del lineup
-        pdf_lineup.image(img_buffer, x=15, w=180)
-
+        # Insertar imagen del lineup desde memoria
+        pdf_lineup.image(img_buffer, x=15, w=180)  
+        
         # Insertar logo como marca de agua
         logo_buffer = get_watermark(alpha=10)
         pdf_lineup.image(logo_buffer, x=55, y=100, w=100)
 
-        # Generar PDF en memoria 
+        # Generar PDF en memoria        
         pdf_bytes_lineup = pdf_lineup.output(dest="S").encode("latin-1")
 
-        # Codificar PDF en base64 para descarga en Streamlit
+        # Codificar PDF en base64 para descarga
         b64_pdf_lineup = base64.b64encode(pdf_bytes_lineup).decode()
-        
-        # Crear botón HTML para descargar PDF
+
+        # Crear botón HTML rojo para descargar PDF        
         components.html(
             f"""
-            <a href="data:application/pdf_lineup;base64,{b64_pdf_lineup}" download="lineup.pdf">
+            <a href="data:application/pdf;base64,{b64_pdf_lineup}" download="lineup.pdf">
                 <button style="
                     padding:8px 14px;
                     font-size:14px;
                     cursor:pointer;
-                    background-color:#dc2626;
+                    background-color:#dc2626;  
                     color:white;
                     border:none;
                     border-radius:6px;">

@@ -533,7 +533,7 @@ def page_list():
             # Crear botón HTML para descargar el PDF
             components.html(
                 f"""
-                <a href="data:application/pdf_list;base64,{b64_list}" download="player_list.pdf">
+                <a href="data:application/pdf;base64,{b64_list}" download="player_list.pdf">
                     <button style="
                         padding:8px 14px;
                         font-size:14px;
