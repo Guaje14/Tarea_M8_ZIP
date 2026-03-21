@@ -7,11 +7,7 @@ matplotlib
 plotly
 numpy
 openpyxl
-LanusStats
-webdriver-manager
 kaleido
 python-dotenv
 IPython
 scipy
-selenium
-undetected-chromedriver

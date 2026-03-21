@@ -9,16 +9,13 @@ import os
 from PIL import Image
 from datetime import datetime
 
-# Importar funciones de LanusStats
-from LanusStats.functions import get_possible_leagues
+# Importar funciones de datos
+from controllers.db_controller import load_stats_players_fbref
 
 # Importar rutas de configuración
 from common.config import (
     ASSETSIMG, DATA_DIR
 )
-
-# Importar funciones de datos
-from controllers.db_controller import load_stats_players_fbref
 
 # Función que da como resultado la página New League
 def page_newleague():
@@ -80,67 +77,60 @@ def page_newleague():
             with pd.ExcelWriter(MESSAGE_FILE, engine="openpyxl", mode="w") as writer:
                 df_final.to_excel(writer, index=False)
 
-    # Esta función devuelve un diccionario con todas las ligas posibles para distintas fuentes
+    # Función que devuelve un diccionario con todas las ligas posibles para distintas fuentes
     @st.cache_data(show_spinner=False)
     def load_leagues():
-        try:
-            return get_possible_leagues('Copa de la Liga', '2023', 'Fbref')
         
-        except Exception:
-            
-            # Fallback manual sin LanusStats
-            lista_ligas = [
-                "Copa de la Liga",
-                "Primera Division Argentina",
-                "Primera Division Uruguay",
-                "Brasileirao",
-                "Brasileirao B",
-                "Primera Division Colombia",
-                "Primera Division Chile",
-                "Primera Division Peru",
-                "Primera Division Venezuela",
-                "Primera Division Ecuador",
-                "Primera Division Bolivia",
-                "Primera Division Paraguay",
-                "Brasileirao F",
-                "MLS",
-                "USL Championship",
-                "Premier League",
-                "La Liga",
-                "Ligue 1",
-                "Bundesliga",
-                "Serie A",
-                "Big 5 European Leagues",
-                "Danish Superliga",
-                "Eredivisie",
-                "Primeira Liga Portugal",
-                "Copa America",
-                "Euros",
-                "Saudi League",
-                "EFL Championship",
-                "La Liga 2",
-                "Belgian Pro League",
-                "Challenger Pro League",
-                "2. Bundesliga",
-                "Ligue 2",
-                "Serie B",
-                "J1 League",
-                "NWSL",
-                "Womens Super League",
-                "Liga F",
-                "Premier Division South Africa",
-                "Champions League",
-                "Europa League",
-                "Conference League",
-                "Copa Libertadores",
-                "Liga MX"
-            ]
-
-            # Convertimos lista → dict como espera tu código
-            return {
-                "Fbref": {liga: {} for liga in lista_ligas}
-            }
-    
+        # Lista fija de ligas
+        lista_ligas = [
+            "Copa de la Liga",
+            "Primera Division Argentina",
+            "Primera Division Uruguay",
+            "Brasileirao",
+            "Brasileirao B",
+            "Primera Division Colombia",
+            "Primera Division Chile",
+            "Primera Division Peru",
+            "Primera Division Venezuela",
+            "Primera Division Ecuador",
+            "Primera Division Bolivia",
+            "Primera Division Paraguay",
+            "Brasileirao F",
+            "MLS",
+            "USL Championship",
+            "Premier League",
+            "La Liga",
+            "Ligue 1",
+            "Bundesliga",
+            "Serie A",
+            "Big 5 European Leagues",
+            "Danish Superliga",
+            "Eredivisie",
+            "Primeira Liga Portugal",
+            "Copa America",
+            "Euros",
+            "Saudi League",
+            "EFL Championship",
+            "La Liga 2",
+            "Belgian Pro League",
+            "Challenger Pro League",
+            "2. Bundesliga",
+            "Ligue 2",
+            "Serie B",
+            "J1 League",
+            "NWSL",
+            "Womens Super League",
+            "Liga F",
+            "Premier Division South Africa",
+            "Champions League",
+            "Europa League",
+            "Conference League",
+            "Copa Libertadores",
+            "Liga MX"
+        ]
+        # Devolver dict con la misma estructura que LanusStats esperaba
+        return {"Fbref": {liga: {} for liga in lista_ligas}}
+        
     ligas = load_leagues()
 
     # Filtrar solo las ligas de FBref
