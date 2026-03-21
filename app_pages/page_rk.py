@@ -95,9 +95,7 @@ def page_rk():
         rk_num_players = st.slider(
             "N° Players",
             0,
-            100,
-            st.session_state["rk_num_players_filter"],
-            
+            100,            
             # KEY única para evitar conflictos con otras páginas
             key="rk_num_players_filter"
         )
