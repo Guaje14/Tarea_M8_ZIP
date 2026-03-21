@@ -413,7 +413,7 @@ def page_list():
             total_pages = (len(df_list) - 1) // display_limit + 1
 
             # Botones de navegación
-            nav_col1, nav_col2, nav_col3 = st.columns([2, 5, 1])
+            nav_col1, nav_col2, nav_col3 = st.columns([2, 4, 1])
 
             with nav_col1:
                 if st.button("⬅️ Previous") and st.session_state["page_idx"] > 0:
