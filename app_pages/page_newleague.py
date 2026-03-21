@@ -141,7 +141,7 @@ def page_newleague():
                 "Fbref": {liga: {} for liga in lista_ligas}
             }
     
-    ligas = ligas = load_leagues()
+    ligas = load_leagues()
 
     # Filtrar solo las ligas de FBref
     ligas_fbref = ligas["Fbref"]
