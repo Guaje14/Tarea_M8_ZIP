@@ -487,7 +487,7 @@ def page_lineup():
         # Codificar PDF en base64 para descarga
         b64_pdf_lineup = base64.b64encode(pdf_bytes_lineup).decode()
 
-        # Crear botón HTML rojo para descargar PDF        
+        # Crear botón HTML para descargar el PDF    
         components.html(
             f"""
             <a href="data:application/pdf;base64,{b64_pdf_lineup}" download="lineup.pdf">

@@ -565,9 +565,10 @@ def page_radar():
     height=55
     )                           
 
+    # Botón en Streamlit para preparar el PDF
     if st.button("⚙️ Prepare PDF") and chart_type_val and playerA and playerB:
 
-        # Generar el radar con los valores ya calculados
+        # Generar el radar usando la función anterior
         fig_mat = generate_radar_matplotlib(
             rA_vals=rA_vals,
             rB_vals=rB_vals,
@@ -579,38 +580,38 @@ def page_radar():
             textB=textB
         )
 
-        # Guardar figura en memoria como PNG
+        # Guardar la figura en un buffer en memoria como PNG
         radar_buffer = io.BytesIO()
         fig_mat.savefig(radar_buffer, format="png", bbox_inches='tight', dpi=200)
-        plt.close(fig_mat)  # cerrar la figura para liberar memoria
-        radar_buffer.seek(0)
+        plt.close(fig_mat)          # Cerrar figura para liberar memoria
+        radar_buffer.seek(0)        # Reposicionar puntero al inicio del buffer
 
+        # Crear un PDF nuevo
         pdf_radar = FPDF()
-        pdf_radar.add_page()
+        pdf_radar.add_page()        # Añadir página al PDF
+
+        # Configurar fuente
         pdf_radar.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
         pdf_radar.set_font("DejaVu", "", 12)
 
+        # Título del PDF con usuario, tipo de radar y método
         usuario_radar = st.session_state.get("user").username if st.session_state.get("user") else "Desconocido"
         title_radar = f"User: {usuario_radar} | Radar Type: {chart_type_val} | Method: {method_val or 'N/A'}"
         pdf_radar.multi_cell(0, 10, title_radar, align="C")
-        pdf_radar.ln(5)
-
-        # Insertar gráfico generado en el PDF
+        pdf_radar.ln(5)             
+        
+        # Insertar la imagen del radar en el PDF
         pdf_radar.image(radar_buffer, x=15, w=100)
 
-        # -----------------------------
-        # Insertar marca de agua opcional
-        # -----------------------------
+        # Añadir marca de agua o logo
         logo_path_radar = get_watermark(alpha=10)
         pdf_radar.image(logo_path_radar, x=55, y=100, w=100)
 
-        # -----------------------------
-        # Exportar PDF como base64 para descargar en Streamlit
-        # -----------------------------
+        # Convertir PDF a bytes y luego a base64 para descargar en Streamlit
         pdf_bytes_radar = pdf_radar.output(dest="S")
         pdf_base64_radar = base64.b64encode(pdf_bytes_radar).decode("utf-8")
 
-        # Botón de descarga
+        # Crear botón HTML para descargar el PDF
         components.html(
             f"""
             <a href="data:application/pdf;base64,{pdf_base64_radar}" download="radar.pdf">
