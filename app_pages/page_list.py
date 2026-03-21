@@ -481,7 +481,7 @@ def page_list():
             pdf.cell(0, 10, "Player List", ln=True, align="C")
             pdf.ln(5)
 
-            col_widths = [25, 15, 15, 5, 5, 30, 5]
+            col_widths = [35, 25, 25, 25, 25, 35, 20]
             headers = ["Player", "Team", "League", "Position", "List", "Note", "User"]
 
             for i, header in enumerate(headers):
