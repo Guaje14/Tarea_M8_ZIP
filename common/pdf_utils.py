@@ -138,7 +138,7 @@ def generate_radar_matplotlib(rA_vals, rB_vals, selected_stats, playerA, playerB
     # Configuración de etiquetas de las estadísticas
     ax.set_xticks(angles)
     ax.set_xticklabels(selected_stats, fontsize=10)
-    ax.tick_params(axis='x', pad=20)
+    ax.tick_params(axis='x', pad=35)
 
     # Configuración de eje radial
     ax.set_yticks(range(0, 101, 20))    # Ticks cada 20 unidades

@@ -601,7 +601,7 @@ def page_radar():
         pdf_radar.ln(5)             
         
         # Insertar la imagen del radar en el PDF
-        pdf_radar.image(radar_buffer, x=15, w=150)
+        pdf_radar.image(radar_buffer, x=30, w=150)
 
         # Añadir marca de agua o logo
         logo_path_radar = get_watermark(alpha=10)
