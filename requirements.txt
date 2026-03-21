@@ -1,6 +1,6 @@
 streamlit
 pandas
-fpdf2
+fpdf2>=2.8.5
 requests
 Pillow
 matplotlib
