@@ -274,6 +274,7 @@ def main():
         st.session_state["logged"] = False
         st.session_state["user"] = None
         st.session_state["is_admin"] = False
+        st.session_state["pagina"] = "overview"
         st.rerun()
 
     # Logout automático si la sesión expira
