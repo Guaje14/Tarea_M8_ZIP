@@ -99,9 +99,10 @@ def login_screen():
             if user == "admin" and password == "admin":
                 st.session_state["logged"] = True
                 st.session_state["user"] = User(username="Guest", password="", role="viewer")
-                st.session_state["is_admin"] = False  # visitante no es admin
-                log_access("Guest")  # registro del visitante
-
+                st.session_state["is_admin"] = False  
+                st.session_state["login_time"] = datetime.now()
+                log_access("Guest")  
+                
             # Acceso como usuario registrado
             else:
                 # Cargar usuarios desde Excel como lista de objetos User
@@ -114,6 +115,7 @@ def login_screen():
                     st.session_state["logged"] = True
                     st.session_state["user"] = match
                     st.session_state["is_admin"] = match.is_admin()
+                    st.session_state["login_time"] = datetime.now()
                     log_access(match.username)
                 else:
                     st.error("User or Password incorrects")
