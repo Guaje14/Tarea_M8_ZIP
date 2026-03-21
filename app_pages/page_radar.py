@@ -392,34 +392,43 @@ def page_radar():
             # Método Percentil: compara jugadores con su posición y rango de mínimos
             elif method_val == "Percentil":
             
-                # Calcular la media de minutos entre los dos jugadores  
-                min_half_avg = ((minA + minB) / 2) / 2  
-                
-                # Filtrar la muestra (df_base) por posición y minutos
-                df_baseA = radar_df[(radar_df["stats_Pos"] == posA) 
-                                    & (radar_df["stats_Min"] >= min_half_avg)]
-                
-                df_baseB = radar_df[(radar_df["stats_Pos"] == posB) 
-                                    & (radar_df["stats_Min"] >= min_half_avg)]
-                
-                # Normalizar la estadística a 90 minutos
-                valA_norm = valA / minA * 90
-                valB_norm = valB / minB * 90
-                
-                # Calcular el percentil
-                if not df_baseA.empty:
-                    rA = stats.percentileofscore(df_baseA[stat] / df_baseA["stats_Min"] * 90, valA_norm, kind="rank")
-                else:
-                    rA = 50
+                # Minutos jugados de los dos jugadores
+                minA = radar_df.loc[radar_df["Player"] == playerA, "stats_Min"].values[0]
+                minB = radar_df.loc[radar_df["Player"] == playerB, "stats_Min"].values[0]
 
-                if not df_baseB.empty:
-                    rB = stats.percentileofscore(df_baseB[stat] / df_baseB["stats_Min"] * 90, valB_norm, kind="rank")
-                else:
-                    rB = 50
-                
-            # Guardar valores normalizados para el radar
-            rA_vals.append(rA)
-            rB_vals.append(rB)
+                # Calcular la "media de la media" (threshold)
+                threshold = (minA + minB) / 2 / 2  # es decir, un cuarto de la suma de minA+minB
+
+                # Para cada estadística
+                for stat in selected_stats:
+                    # Valor del jugador
+                    valA = radar_df.loc[radar_df["Player"] == playerA, stat].values[0]
+                    valB = radar_df.loc[radar_df["Player"] == playerB, stat].values[0]
+
+                    # Normalización a 90 minutos (evitar división por 0)
+                    valA_norm = valA / minA * 90 if minA > 0 else 0
+                    valB_norm = valB / minB * 90 if minB > 0 else 0
+
+                    # Filtrar jugadores de la misma posición y con suficiente tiempo
+                    df_baseA = radar_df[(radar_df["stats_Pos"] == posA) & (radar_df["stats_Min"] >= threshold)]
+                    df_baseB = radar_df[(radar_df["stats_Pos"] == posB) & (radar_df["stats_Min"] >= threshold)]
+
+                    # Calcular percentil (fallback a 50 si la muestra está vacía)
+                    if not df_baseA.empty:
+                        rA = stats.percentileofscore(df_baseA[stat] / df_baseA["stats_Min"] * 90, valA_norm, kind="rank")
+                    else:
+                        rA = 50
+
+                    if not df_baseB.empty:
+                        rB = stats.percentileofscore(df_baseB[stat] / df_baseB["stats_Min"] * 90, valB_norm, kind="rank")
+                    else:
+                        rB = 50
+
+                    # Guardar siempre valores y textos para el radar
+                    rA_vals.append(rA)
+                    rB_vals.append(rB)
+                    textA.append(f"{rA:.0f}")
+                    textB.append(f"{rB:.0f}")
 
         # Configuración de ángulos y anchuras para el radar
         n = len(selected_stats)
