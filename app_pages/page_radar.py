@@ -24,7 +24,7 @@ from common.config import (
 
 # Importar funciones de datos y marca de agua
 from controllers.db_controller import load_stats_players_fbref
-from common.pdf_utils import get_watermark
+from common.pdf_utils import get_watermark, generate_radar_matplotlib
     
 # Función que da cómo resultado la página Radar
 def page_radar(): 
@@ -566,62 +566,38 @@ def page_radar():
     )                           
 
     if st.button("⚙️ Prepare PDF") and chart_type_val and playerA and playerB:
+        # Usar la función con los datos ya calculados
+        fig_mat = generate_radar_matplotlib(rA_vals, rB_vals, textA, textB, selected_stats, playerA, playerB, chart_type_val)
 
-        # -----------------------------
-        # Guardar la figura Plotly en memoria (sin Kaleido)
-        # -----------------------------
+        # Guardar en memoria
         radar_buffer = io.BytesIO()
-        img_bytes = fig.to_image(format="png", width=800, height=800)  # genera PNG bytes
-        radar_buffer.write(img_bytes)
-        radar_buffer.seek(0)  # mover cursor al inicio
+        fig_mat.savefig(radar_buffer, format="png", bbox_inches='tight', dpi=150)
+        plt.close(fig_mat)
+        radar_buffer.seek(0)
 
-        # -----------------------------
         # Crear PDF
-        # -----------------------------
         pdf_radar = FPDF()
         pdf_radar.add_page()
         pdf_radar.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
         pdf_radar.set_font("DejaVu", "", 12)
-
+        
         usuario_radar = st.session_state.get("user").username if st.session_state.get("user") else "Desconocido"
         title_radar = f"User: {usuario_radar} | Radar Type: {chart_type_val} | Method: {method_val or 'N/A'}"
         pdf_radar.multi_cell(0, 10, title_radar, align="C")
         pdf_radar.ln(5)
 
-        # -----------------------------
-        # Insertar radar desde BytesIO
-        # -----------------------------
-        pdf_radar.image(radar_buffer, x=15, w=180)  # w=180 ajusta ancho del radar
+        pdf_radar.image(radar_buffer, x=15, w=180)
 
-        # -----------------------------
-        # Insertar logo de marca de agua
-        # -----------------------------
+        # Marca de agua
         logo_path_radar = get_watermark(alpha=10)
         pdf_radar.image(logo_path_radar, x=55, y=100, w=100)
 
-        # -----------------------------
-        # Generar PDF en memoria como bytes
-        # -----------------------------
-        pdf_bytes_radar = pdf_radar.output(dest="S")
+        # Generar bytes y mostrar botón descarga
+        pdf_bytes_radar = pdf_radar.output(dest="S").encode("latin-1")
         pdf_base64_radar = base64.b64encode(pdf_bytes_radar).decode("utf-8")
-
-        # -----------------------------
-        # Descargar PDF desde Streamlit
-        # -----------------------------
         components.html(
-            f"""
-            <a href="data:application/pdf;base64,{pdf_base64_radar}" download="radar.pdf">
-                <button style="
-                    padding:8px 14px;
-                    font-size:14px;
-                    cursor:pointer;
-                    background-color:#dc2626;
-                    color:white;
-                    border:none;
-                    border-radius:6px;">
-                    📄 Export Radar to PDF
-                </button>
-            </a>
-            """,
+            f"""<a href="data:application/pdf;base64,{pdf_base64_radar}" download="radar.pdf">
+                    <button style="padding:8px 14px;font-size:14px;cursor:pointer;background-color:#dc2626;color:white;border:none;border-radius:6px;">
+                    📄 Export Radar to PDF</button></a>""",
             height=55
         )
