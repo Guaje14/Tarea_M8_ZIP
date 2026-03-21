@@ -469,7 +469,7 @@ def page_lineup():
         jornada = st.session_state.get("lineup_matchday",1)
         title = f"Username: {usuario}    System: {sistema}    Matchday: {jornada}"
 
-        # Título del PDF c
+        # Título del PDF
         pdf_lineup.set_font("DejaVu", "", 25)
         pdf_lineup.cell(0, 12, title, ln=True, align="C")
         pdf_lineup.ln(8)  
@@ -481,8 +481,8 @@ def page_lineup():
         logo_buffer = get_watermark(alpha=10)
         pdf_lineup.image(logo_buffer, x=55, y=100, w=100)
 
-        # Generar PDF en memoria        
-        pdf_bytes_lineup = pdf_lineup.output(dest="S").encode("latin-1")
+        # Generar PDF en memoria
+        pdf_bytes_lineup = pdf_lineup.output(dest="S")  # ya es bytes, no hacer .encode()
 
         # Codificar PDF en base64 para descarga
         b64_pdf_lineup = base64.b64encode(pdf_bytes_lineup).decode()

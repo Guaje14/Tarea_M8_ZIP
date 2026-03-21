@@ -476,33 +476,27 @@ def page_list():
 
             # Crear objeto PDF
             pdf_list = FPDF()
-            
-            # Añadir una página al documento
-            pdf_list.add_page()  
+            pdf_list.add_page()
 
-            # Añadir fuente personalizada 
+            # Añadir fuente personalizada
             pdf_list.add_font("DejaVu", "", str(ASSETSFONTS / "DejaVuSans.ttf"), uni=True)
 
             # Título del PDF
             pdf_list.set_font("DejaVu", "", 35)
-            pdf_list.cell(0, 12, "List of Players", ln=True, align="C")  
-            pdf_list.ln(10)  
+            pdf_list.cell(0, 12, "List of Players", ln=True, align="C")
+            pdf_list.ln(10)
 
             # Configurar fuente para cabecera de tabla
             pdf_list.set_font("DejaVu", "", 12)
-            
-            # Anchos de cada columna
             col_widths_list = [35, 35, 35, 20, 20, 20, 20]
-            
-            # Nombres de columnas
             headers_list = ["Player", "Team", "League", "Position", "List", "Note", "User"]
 
             # Crear cabecera de la tabla
             for i, header in enumerate(headers_list):
                 pdf_list.cell(col_widths_list[i], 8, header, border=1, align="C")
-            pdf_list.ln()  # Nueva línea después de la cabecera
+            pdf_list.ln()
 
-            # Función auxiliar para truncar texto largo 
+            # Función auxiliar para truncar texto largo
             def truncate(text, max_len=19):
                 return text[:max_len] + "..." if len(text) > max_len else text
 
@@ -518,14 +512,14 @@ def page_list():
                 pdf_list.cell(col_widths_list[4], 8, str(row["List"]), border=1)
                 pdf_list.cell(col_widths_list[5], 8, truncate(str(row["Note"])), border=1)
                 pdf_list.cell(col_widths_list[6], 8, str(row["User"]), border=1)
-                pdf_list.ln()  # Nueva línea por cada fila
+                pdf_list.ln()
 
             # Añadir logo como marca de agua
             logo_buffer_list = get_watermark(alpha=10)
             pdf_list.image(logo_buffer_list, x=55, y=100, w=100)
 
-            # Generar PDF en memoria (no se guarda en disco)
-            pdf_bytes_list = pdf_list.output(dest="S").encode("latin-1")
+            # Generar PDF en memoria como bytes
+            pdf_bytes_list = pdf_list.output_bytes()  # ✅ Método moderno de fpdf2
 
             # Codificar PDF en base64 para descarga en navegador
             b64_list = base64.b64encode(pdf_bytes_list).decode()
