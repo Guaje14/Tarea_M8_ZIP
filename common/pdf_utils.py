@@ -25,4 +25,4 @@ def get_watermark(alpha: int = 30, logo_filename: str = "Logo_app_StreamlitM8.pn
     watermark.save(tmp_file.name, format="PNG")
     tmp_file.close()
     
-    tmp_file.name
+    return tmp_file.name
