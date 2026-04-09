@@ -33,7 +33,7 @@ def load_stats_players_fbref():
     conn.close()
 
     # Columnas que deben mantenerse como texto
-    text_cols = ["Player", "stats_Comp", "stats_Squad", "stats_Pos"]
+    text_cols = ["Player", "stats_Nation", "stats_Pos", "stats_Squad", "stats_Comp", "league"]
 
     # Obtener todas las columnas excepto las de texto
     numeric_cols = df.columns.difference(text_cols)
