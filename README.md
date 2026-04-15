@@ -20,23 +20,18 @@ Entre las posibilidades que ofrece la app se incluyen:
 
 ## Dependencias
 
-La aplicación requiere Python y las siguientes librerías:  
+La aplicación ha sido desarrollada en **Python** y utiliza las siguientes librerías principales:
 
-- streamlit  
-- pandas  
-- fpdf2  
-- requests  
-- Pillow  
-- matplotlib  
-- plotly  
-- numpy  
-- openpyxl  
-- LanusStats  
-- IPython  
-- python-dotenv  
-- scipy
+* **Streamlit** para la interfaz web.
+* **SQLite** como base de datos local.
+* **pandas** y **numpy** para procesamiento de datos.
+* **plotly** y **matplotlib** para visualización.
+* **Pillow** para gestión de imágenes.
+* **LanusStats** para la extracción de datos desde **Fbref**.
+* **openpyxl**, **fpdf2**, **requests**, **scipy**, **python-dotenv** e **IPython** como librerías auxiliares para exportación, peticiones, cálculos complementarios, gestión de configuración y trabajo interactivo.
+* **sqlalchemy**, **psycopg2-binary** e **bcrypt** para conexión y gestión de bases de datos, integración con PostgreSQL y cifrado seguro de contraseñas.
 
-Se pueden instalar con:
+Las dependencias se pueden instalar con:
 
 ```bash
 pip install -r requirements.txt
