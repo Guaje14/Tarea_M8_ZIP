@@ -46,7 +46,7 @@ def page_league_requests_admin():
     def load_requests():
         
         # Columnas esperadas en el DataFrame
-        columns = ["User","League","Priority","Message","Date","Status"]
+        columns = ["User", "League", "Priority", "Message", "Date", "Status"]
         
         # Si el archivo no existe, devolver un DataFrame vacío con las columnas definidas
         if not os.path.exists(MESSAGE_FILE):
@@ -54,10 +54,17 @@ def page_league_requests_admin():
         
         # Cargar las solicitudes existentes desde Excel
         df = pd.read_excel(MESSAGE_FILE)
-        
-        # Si no existe la columna "Status", añadirla con valor por defecto "Pending"
-        if "Status" not in df.columns:
-            df["Status"] = "Pending"
+
+        # Asegurar que todas las columnas esperadas existen
+        for col in columns:
+            if col not in df.columns:
+                df[col] = ""
+
+        # Asegurar que Status es una columna de texto
+        df["Status"] = df["Status"].fillna("").astype("string")
+
+        # Poner Pending donde Status esté vacío
+        df.loc[df["Status"] == "", "Status"] = "Pending"
         
         # Devolver el DataFrame cargado
         return df
