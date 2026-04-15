@@ -167,7 +167,7 @@ def page_lineup():
         ]
     }
         
-    # Almacena los jugadores asignados a cada posición (11 posiciones)
+    # Definir diccionario con valores por defecto de la alineación
     lineup_defaults = {
         "lineup_sistema": lineup_sistemas[0],
         "lineup_league_filter": "All",
@@ -176,7 +176,7 @@ def page_lineup():
         "lineup_players": [None]*11,
         "lineup_player_to_add": "Select",
         "lineup_matchday": 1,
-        "lineup_selected_pos": None,
+        "lineup_selected_pos": 0,
         
         "lineup_do_reset": False
     }
@@ -303,17 +303,9 @@ def page_lineup():
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
-        # Botón Reset 
+        # Crear botón para reiniciar la alineación
         if st.button("🔄 Reset"):
-            # Reiniciar todos los valores del lineup
-            st.session_state["lineup_sistema"] = lineup_sistemas[0]
-            st.session_state["lineup_league_filter"] = "All"
-            st.session_state["lineup_team_filter"] = "All"
-            st.session_state["lineup_pos_filter"] = "All"
-            st.session_state["lineup_players"] = [None]*11
-            st.session_state["lineup_player_to_add"] = "Select"
-            st.session_state["lineup_matchday"] = 1
-            st.session_state["lineup_selected_pos"] = 0  # posición por defecto
+            st.session_state["lineup_do_reset"] = True
             st.rerun()
         
     with lineup_field_col:
